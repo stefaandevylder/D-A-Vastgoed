@@ -2,6 +2,7 @@
 using Abot2.Poco;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using DnaVastgoed.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -65,27 +66,18 @@ namespace DnaVastgoed {
             }
         }
 
+        /**
+         * When a page is done crawling, we'll need the information
+         * regarding the properties so we can save them. This exctracts
+         * the information through html.
+         */
         private static void PageCrawlCompleted(object sender, PageCrawlCompletedArgs e) {
             IHtmlDocument document = e.CrawledPage.AngleSharpHtmlDocument;
 
-            string name = GetText(document, "h1.property-title");
-            string desc = GetText(document, "div.description-inner");
-            string energy = GetText(document, "div.indicator-energy");
-            string location = GetText(document, "div.property-location a");
-            IHtmlCollection<IElement> detailsList = document.QuerySelectorAll("div.property-detail-detail ul li");
+            Property property = new Property();
+            property.ParseFromHTML(document);
 
-            Console.WriteLine(name);
-            Console.WriteLine(desc);
-            Console.WriteLine(energy);
-            Console.WriteLine(location);
-
-            foreach (var el in detailsList) {
-                Console.WriteLine(el.QuerySelector("div.text").Text() + el.QuerySelector("div.value").Text());
-            }
-        }
-
-        private static string GetText(IHtmlDocument document, string querySelector) {
-            return document.QuerySelector(querySelector) != null ? document.QuerySelector(querySelector).Text() : "";
+            Console.WriteLine("Saved: " + property.ToString());
         }
     }
 }
