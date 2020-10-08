@@ -17,18 +17,18 @@ namespace DnaVastgoed {
 
         private static readonly string BASE_URL = "http://134.209.94.232/wp-json/wp/v2/property?per_page=100&orderby=date";
 
+        private static ApplicationDbContext _database = new ApplicationDbContext();
         private static ICollection<string> _links = new List<string>();
-        private static ICollection<Property> _properties = new List<Property>();
 
         static async Task Main(string[] args) {
             Console.WriteLine("Started parsing properties: " + BASE_URL);
             ParseJson();
 
+            Console.WriteLine("Creating database if needed...");
+            await _database.Database.EnsureCreatedAsync();
+
             Console.WriteLine("Started crawling...");
             await StartCrawler();
-
-            Console.WriteLine("Started database writeback...");
-            UpdateDatabase();
         }
 
         /**
@@ -83,29 +83,26 @@ namespace DnaVastgoed {
             Property property = new Property();
             property.ParseFromHTML(document);
 
-            _properties.Add(property);
             Console.WriteLine("Received: " + property.ToString());
+
+            InsertProperty(property);
         }
 
         /**
-         * Inserts all properties in the database and checks other versions,
+         * Inserts property in the database and checks other versions,
          * if a new one is found, it has to be sent to the other
          * services. (Updates will come soon)
          */
-        private static void UpdateDatabase() {
-            using (var db = new ApplicationDbContext()) {
-                db.Database.EnsureCreated();
+        private static void InsertProperty(Property property) {
+            Property propertyFound = _database.Properties.FirstOrDefault(p => p == property);
 
-                foreach (Property property in _properties) {
-                    Property propertieFound = db.Properties.FirstOrDefault(x => x.Id == property.Id);
+            if (propertyFound == null) {
+                _database.Properties.Add(property);
+                Console.WriteLine($"Added property {property.Id} to database.");
 
-                    if (propertieFound != null) {
-                        db.Add(property);
-                        Console.WriteLine($"Added property {property.Id} to DB.");
-                    }
-                }
-
-                db.SaveChanges();
+                _database.SaveChanges();
+            } else {
+                Console.WriteLine($"Property {property.Id} already exists, skipping.");
             }
         }
     }
