@@ -2,10 +2,12 @@
 using Abot2.Poco;
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using DnaVastgoed.Data;
 using DnaVastgoed.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -16,13 +18,17 @@ namespace DnaVastgoed {
         private static readonly string BASE_URL = "http://134.209.94.232/wp-json/wp/v2/property?per_page=100&orderby=date";
 
         private static ICollection<string> _links = new List<string>();
+        private static ICollection<Property> _properties = new List<Property>();
 
         static async Task Main(string[] args) {
             Console.WriteLine("Started parsing properties: " + BASE_URL);
             ParseJson();
 
-            Console.WriteLine("Started crawling.");
+            Console.WriteLine("Started crawling...");
             await StartCrawler();
+
+            Console.WriteLine("Started database writeback...");
+            UpdateDatabase();
         }
 
         /**
@@ -52,7 +58,7 @@ namespace DnaVastgoed {
         private static async Task StartCrawler() {
             var config = new CrawlConfiguration {
                 MaxPagesToCrawl = 1,
-                MinCrawlDelayPerDomainMilliSeconds = 1000
+                MinCrawlDelayPerDomainMilliSeconds = 100
             };
 
             var crawler = new PoliteWebCrawler(config);
@@ -77,7 +83,30 @@ namespace DnaVastgoed {
             Property property = new Property();
             property.ParseFromHTML(document);
 
-            Console.WriteLine("Saved: " + property.ToString());
+            _properties.Add(property);
+            Console.WriteLine("Received: " + property.ToString());
+        }
+
+        /**
+         * Inserts all properties in the database and checks other versions,
+         * if a new one is found, it has to be sent to the other
+         * services. (Updates will come soon)
+         */
+        private static void UpdateDatabase() {
+            using (var db = new ApplicationDbContext()) {
+                db.Database.EnsureCreated();
+
+                foreach (Property property in _properties) {
+                    Property propertieFound = db.Properties.FirstOrDefault(x => x.Id == property.Id);
+
+                    if (propertieFound != null) {
+                        db.Add(property);
+                        Console.WriteLine($"Added property {property.Id} to DB.");
+                    }
+                }
+
+                db.SaveChanges();
+            }
         }
     }
 }

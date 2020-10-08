@@ -7,6 +7,8 @@ namespace DnaVastgoed.Models {
 
         public string Id { get; private set; }
         public string Name { get; private set; }
+        public bool IsUploaded { get; set; }
+
         public string Description { get; private set; }
         public string Location { get; private set; }
         public string Energy { get; private set; }
@@ -18,8 +20,6 @@ namespace DnaVastgoed.Models {
         public string Bathrooms { get; private set; }
         public string Status { get; private set; }
         public string EPCNumber { get; private set; }
-
-        //Belgian Law Things
         public string Katastraalinkomen { get; private set; }
         public string OrientatieAchtergevel { get; private set; }
         public string Elektriciteitskeuring { get; private set; }
