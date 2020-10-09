@@ -1,2 +1,2 @@
-# D-A-Vastgoed
-Haalt de panden van de D&amp;A Vastgoed website en upload ze automatisch naar Immovlan, Immoproxio &amp; Zimmo.
+# Web Crawler D&A Vastgoed
+This is a script to crawle DnaVastgoed.be for properties, if found, it stores it in a SQLite DB and sends them to other websites such as ImmoVlan, Zimmo, Realo, ...
