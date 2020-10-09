@@ -8,6 +8,6 @@ namespace DnaVastgoed.Data {
         public DbSet<Property> Properties { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
-            => options.UseSqlite("Data Source=DnaVastgoed.db");
+            => options.UseSqlite("Data Source=Database.db");
     }
 }

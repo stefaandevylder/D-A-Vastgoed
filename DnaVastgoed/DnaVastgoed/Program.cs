@@ -1,6 +1,5 @@
 ﻿using Abot2.Crawler;
 using Abot2.Poco;
-using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using DnaVastgoed.Data;
 using DnaVastgoed.Models;
@@ -15,14 +14,15 @@ namespace DnaVastgoed {
 
     class Program {
 
-        private static readonly string BASE_URL = "http://134.209.94.232/wp-json/wp/v2/property?per_page=100&orderby=date";
+        private ApplicationDbContext _database = new ApplicationDbContext();
+        private ICollection<string> _links = new List<string>();
 
-        private static ApplicationDbContext _database = new ApplicationDbContext();
-        private static ICollection<string> _links = new List<string>();
-
-        static async Task Main(string[] args) {
-            Console.WriteLine("Started parsing properties: " + BASE_URL);
-            ParseJson();
+        /**
+         * Starts the program.
+         */
+        public async Task Start(string baseUrl) {
+            Console.WriteLine("Started parsing properties: " + baseUrl);
+            ParseJson(baseUrl);
 
             Console.WriteLine("Creating database if needed...");
             await _database.Database.EnsureCreatedAsync();
@@ -39,9 +39,9 @@ namespace DnaVastgoed {
          * is because the location is not within this information.
          * All custom fields are also not in this information.
          */
-        private static void ParseJson() {
+        private void ParseJson(string baseUrl) {
             HttpClient http = new HttpClient();
-            var rawData = http.GetAsync(BASE_URL).Result.Content.ReadAsStringAsync().Result;
+            var rawData = http.GetAsync(baseUrl).Result.Content.ReadAsStringAsync().Result;
             var myJson = JArray.Parse(rawData);
 
             foreach (JObject item in myJson) {
@@ -49,13 +49,13 @@ namespace DnaVastgoed {
                 Console.WriteLine($"Link added: {item["link"]}");
             }
         }
-        
+
         /**
          * Starts the crawler to crawl found pages.
          * It takes 1 second per page to ensure it does not lock
          * us out and we can keep crawling the site?
          */
-        private static async Task StartCrawler() {
+        private async Task StartCrawler() {
             var config = new CrawlConfiguration {
                 MaxPagesToCrawl = 1,
                 MinCrawlDelayPerDomainMilliSeconds = 100
@@ -63,7 +63,7 @@ namespace DnaVastgoed {
 
             var crawler = new PoliteWebCrawler(config);
             crawler.PageCrawlCompleted += PageCrawlCompleted;
-            
+
             foreach (string link in _links) {
                 crawler = new PoliteWebCrawler(config);
                 crawler.PageCrawlCompleted += PageCrawlCompleted;
@@ -77,7 +77,7 @@ namespace DnaVastgoed {
          * regarding the properties so we can save them. This exctracts
          * the information through html.
          */
-        private static void PageCrawlCompleted(object sender, PageCrawlCompletedArgs e) {
+        private void PageCrawlCompleted(object sender, PageCrawlCompletedArgs e) {
             IHtmlDocument document = e.CrawledPage.AngleSharpHtmlDocument;
 
             Property property = new Property();
@@ -93,7 +93,7 @@ namespace DnaVastgoed {
          * if a new one is found, it has to be sent to the other
          * services. (Updates will come soon)
          */
-        private static void InsertProperty(Property property) {
+        private void InsertProperty(Property property) {
             Property propertyFound = _database.Properties.FirstOrDefault(p => p == property);
 
             if (propertyFound == null) {
