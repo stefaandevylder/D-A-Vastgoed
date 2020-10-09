@@ -5,31 +5,35 @@ namespace DnaVastgoed.Models {
 
     class Property {
 
+        //Identification
         public string Id { get; private set; }
-        public string Name { get; private set; }
+        public string Name { get; set; }
         public bool IsUploaded { get; set; }
 
-        public string Description { get; private set; }
-        public string Location { get; private set; }
-        public string Energy { get; private set; }
-        public string Price { get; private set; }
-        public string LotArea { get; private set; }
-        public string LivingArea { get; private set; }
-        public string Rooms { get; private set; }
-        public string Bedrooms { get; private set; }
-        public string Bathrooms { get; private set; }
-        public string Status { get; private set; }
-        public string EPCNumber { get; private set; }
-        public string Katastraalinkomen { get; private set; }
-        public string OrientatieAchtergevel { get; private set; }
-        public string Elektriciteitskeuring { get; private set; }
-        public string Bouwvergunning { get; private set; }
-        public string StedenbouwkundigeBestemming { get; private set; }
-        public string Verkavelingsvergunning { get; private set; }
-        public string Dagvaarding { get; private set; }
-        public string Verkooprecht { get; private set; }
-        public string RisicoOverstroming { get; private set; }
-        public string AfgebakendOverstromingsGebied { get; private set; }
+        //Basic information
+        public string Description { get; set; }
+        public string Location { get; set; }
+        public string Energy { get; set; }
+        public string Price { get; set; }
+        public string LotArea { get; set; }
+        public string LivingArea { get; set; }
+        public string Rooms { get; set; }
+        public string Bedrooms { get; set; }
+        public string Bathrooms { get; set; }
+        public string Status { get; set; }
+        public string EPCNumber { get; set; }
+
+        //Necessary items for Belgian law
+        public string Katastraalinkomen { get; set; }
+        public string OrientatieAchtergevel { get; set; }
+        public string Elektriciteitskeuring { get; set; }
+        public string Bouwvergunning { get; set; }
+        public string StedenbouwkundigeBestemming { get; set; }
+        public string Verkavelingsvergunning { get; set; }
+        public string Dagvaarding { get; set; }
+        public string Verkooprecht { get; set; }
+        public string RisicoOverstroming { get; set; }
+        public string AfgebakendOverstromingsGebied { get; set; }
 
         /**
          * Parses the HTML document to an entity.
@@ -72,10 +76,16 @@ namespace DnaVastgoed.Models {
             }
         }
 
+        /**
+         * To see if a detail exists on the page.
+         */
         private string GetText(IHtmlDocument document, string querySelector) {
             return document.QuerySelector(querySelector) != null ? document.QuerySelector(querySelector).Text() : "";
         }
 
+        /**
+         * Needed for console writing.
+         */
         public override string ToString() {
             return $"Property {Name} with ID: {Id}";
         }
