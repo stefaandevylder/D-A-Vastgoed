@@ -18,16 +18,16 @@ namespace DnaVastgoed.Models {
          */
         public XDocument ToXMLDocument() {
             XDocument doc = new XDocument(
-                new XElement("root",
-                    new XElement("request", "",
-                            new XAttribute("timestamp", DateTime.Now.ToString().Replace(" ", "T")),
-                            new XAttribute("softwareId", $"{SoftwareId}"),
-                        new XElement("action", "",
-                            new XAttribute("proCustomerId", ProCustomerId),
-                            new XAttribute("hashValidation", Guid.NewGuid().ToString("N")))),
-                    new XElement("publish",
-                        new XElement("property",
-                            new XElement("classification")
+                new XElement("request", 
+                new XAttribute("timestamp", DateTime.Now.ToString().Replace(" ", "T")), 
+                new XAttribute("softwareId", $"{SoftwareId}"),
+                    new XElement("action", 
+                    new XAttribute("proCustomerId", ProCustomerId), 
+                    new XAttribute("hashValidation", Guid.NewGuid().ToString("N")),
+                        new XElement("publish",
+                            new XElement("property",
+                                new XElement("classification")
+                            )
                         )
                     )
                 )
