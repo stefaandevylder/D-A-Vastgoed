@@ -16,7 +16,7 @@ namespace DnaVastgoed.Models {
         public string Description { get; set; }
         public string Location { get; set; }
         public string Energy { get; set; }
-        public decimal Price { get; set; }
+        public string Price { get; set; }
         public string LotArea { get; set; }
         public string LivingArea { get; set; }
         public string Rooms { get; set; }
@@ -25,7 +25,7 @@ namespace DnaVastgoed.Models {
         public string EPCNumber { get; set; }
 
         //Necessary items for Belgian law
-        public string CadastralIncome { get; set; }
+        public string KatastraalInkomen { get; set; }
         public string OrientatieAchtergevel { get; set; }
         public string Elektriciteitskeuring { get; set; }
         public string Bouwvergunning { get; set; }
@@ -61,10 +61,10 @@ namespace DnaVastgoed.Models {
                     case "Kamers": Rooms = value; break;
                     case "Slaapkamers": Bedrooms = value; break;
                     case "Badkamers": Bathrooms = value; break;
-                    case "Prijs": Price = PriceToDecimal(value); break;
+                    case "Prijs": Price = value; break;
                     case "Pand Status": Status = value;  break;
                     case "EPC Certificaatnr": EPCNumber = value; break;
-                    case "Katastraal Inkomen (KI)": CadastralIncome = value; break;
+                    case "Katastraal Inkomen (KI)": KatastraalInkomen = value; break;
                     case "Orientatie achtergevel": OrientatieAchtergevel = value; break;
                     case "Elektriciteitskeuring": Elektriciteitskeuring = value; break;
                     case "Bouwvergunning": Bouwvergunning = value; break;
@@ -83,13 +83,6 @@ namespace DnaVastgoed.Models {
          */
         private string GetText(IHtmlDocument document, string querySelector) {
             return document.QuerySelector(querySelector) != null ? document.QuerySelector(querySelector).Text() : "";
-        }
-
-        /**
-         * Converts price to decimal format.
-         */
-        private decimal PriceToDecimal(string price) {
-            return decimal.Parse(price.Replace("€", "").Replace("/mo", "").Replace("/maand", ""));
         }
 
         /**

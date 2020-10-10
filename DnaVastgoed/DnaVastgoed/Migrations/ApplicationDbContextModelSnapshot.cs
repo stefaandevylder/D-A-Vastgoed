@@ -50,7 +50,7 @@ namespace DnaVastgoed.Migrations
                     b.Property<bool>("IsUploaded")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Katastraalinkomen")
+                    b.Property<string>("KatastraalInkomen")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("LivingArea")
@@ -81,6 +81,9 @@ namespace DnaVastgoed.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("StedenbouwkundigeBestemming")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Type")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Verkavelingsvergunning")

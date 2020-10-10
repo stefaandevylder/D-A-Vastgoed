@@ -3,12 +3,17 @@ using System.Xml.Linq;
 
 namespace DnaVastgoed.Models {
 
-    class ImmovlanProperty : Property {
+    class ImmovlanProperty {
 
-        //Settings for ImmoVlan
+        public readonly Property property;
+
         public readonly string API = "http://api.staging.immo.vlan.be/upload";
         public readonly int SoftwareId = 2;
         public readonly string ProCustomerId = "XXXXXX";
+
+        public ImmovlanProperty(Property property) {
+            this.property = property;
+        }
 
         /**
          * Creates an XML document especially designed
@@ -26,32 +31,32 @@ namespace DnaVastgoed.Models {
                     new XAttribute("hashValidation", Guid.NewGuid().ToString("N")),
                         new XElement("publish",
                             new XElement("property",
-                            new XAttribute("propertyProId", Id),
-                            new XAttribute("propertySoftwareId", Id),
-                            new XAttribute("commercialStatus", CommercialStatus(Price)),
+                            new XAttribute("propertyProId", property.Id),
+                            new XAttribute("propertySoftwareId", property.Id),
+                            new XAttribute("commercialStatus", CommercialStatus(property.Price)),
                                 new XElement("classification",
-                                    new XElement("transactionType", TransactionType(Status)),
-                                    new XElement("propertyTypeId", TypeToInt(Type))
+                                    new XElement("transactionType", TransactionType(property.Status)),
+                                    new XElement("propertyTypeId", TypeToInt(property.Type))
                                 )
                             ),
                             new XElement("location",
                                 new XElement("address",
-                                    new XElement("street", LocationToAddress(Location)[0]),
-                                    new XElement("streetNumber", LocationToAddress(Location)[1]),
-                                    new XElement("zipCode", LocationToAddress(Location)[2]),
-                                    new XElement("city", LocationToAddress(Location)[3])
+                                    new XElement("street", LocationToAddress(property.Location)[0]),
+                                    new XElement("streetNumber", LocationToAddress(property.Location)[1]),
+                                    new XElement("zipCode", LocationToAddress(property.Location)[2]),
+                                    new XElement("city", LocationToAddress(property.Location)[3])
                                 )
                             ),
                             new XElement("generalInformation",
                                 new XElement("contactEmail", "info@dnavastgoed.be"),
                                 new XElement("propertyUrl", "www.dnavastgoed.be"),
-                                new XElement("cadastralIncome", CadastralIncome)
+                                new XElement("cadastralIncome", property.KatastraalInkomen)
                             ),
                             new XElement("freeDescription",
-                                new XElement("dutch", Description)
+                                new XElement("dutch", property.Description)
                             ),
                             new XElement("financialDetails",
-                                new XElement("price", Price)
+                                new XElement("price", PriceToDecimal(property.Price))
                             )
                         )
                     )
@@ -110,6 +115,13 @@ namespace DnaVastgoed.Models {
             }
 
             return address;
+        }
+
+        /**
+         * Converts price to decimal format.
+         */
+        private decimal PriceToDecimal(string price) {
+            return decimal.Parse(price.Replace("€", "").Replace("/mo", "").Replace("/maand", ""));
         }
     }
 }
