@@ -26,14 +26,52 @@ namespace DnaVastgoed.Models {
                     new XAttribute("hashValidation", Guid.NewGuid().ToString("N")),
                         new XElement("publish",
                             new XElement("property",
-                                new XElement("classification")
-                            )
+                            new XAttribute("propertyProId", Id),
+                            new XAttribute("propertySoftwareId", Id),
+                            new XAttribute("commercialStatus", CommercialStatus(Price)),
+                                new XElement("classification",
+                                    new XElement("transactionType", TransactionType(Status)),
+                                    new XElement("propertyTypeId", TypeToInt(Type))
+                                )
+                            ),
+                            new XElement("location")
                         )
                     )
                 )
             );
 
             return doc;
+        }
+
+        /**
+         * A property is sold when the price has been removed.
+         */
+        private string CommercialStatus(string price) {
+            return price == "" ? "SOLD" : "ONLINE";
+        }
+
+        /**
+         * Converts the status to a status that Immovlan accepts.
+         */
+        private string TransactionType(string status) {
+            return status == "Te Koop" ? "SALE" : "RENT";
+        }
+
+        /**
+         * Converts the type to an int that Immovlan accepts.
+         */
+        private int TypeToInt(string type) {
+            switch (type) {
+                case "Villa": return 20;
+                case "Woning": return 10;
+                case "Appartement": return 170;
+                case "Assistentiewoning": return 130;
+                case "Industrieel/Commercieel": return 320;
+                case "Grond/Buitenparking": return 540;
+                case "Garage": return 550;
+            }
+
+            return 0;
         }
     }
 }
