@@ -34,7 +34,25 @@ namespace DnaVastgoed.Models {
                                     new XElement("propertyTypeId", TypeToInt(Type))
                                 )
                             ),
-                            new XElement("location")
+                            new XElement("location",
+                                new XElement("address",
+                                    new XElement("street", LocationToAddress(Location)[0]),
+                                    new XElement("streetNumber", LocationToAddress(Location)[1]),
+                                    new XElement("zipCode", LocationToAddress(Location)[2]),
+                                    new XElement("city", LocationToAddress(Location)[3])
+                                )
+                            ),
+                            new XElement("generalInformation",
+                                new XElement("contactEmail", "info@dnavastgoed.be"),
+                                new XElement("propertyUrl", "www.dnavastgoed.be"),
+                                new XElement("cadastralIncome", CadastralIncome)
+                            ),
+                            new XElement("freeDescription",
+                                new XElement("dutch", Description)
+                            ),
+                            new XElement("financialDetails",
+                                new XElement("price", Price)
+                            )
                         )
                     )
                 )
@@ -72,6 +90,26 @@ namespace DnaVastgoed.Models {
             }
 
             return 0;
+        }
+
+        /**
+         * Converts single line address to array in order of:
+         * Street, Number, ZipCode, City
+         */
+        private string[] LocationToAddress(string location) {
+            string[] address = new string[5];
+
+            if (location.Split(",").Length > 0) {
+                string[] streetAndNr = location.Split(",")[0].Split(" ");
+                string[] zipAndCity = location.Split(",")[1].Split(" ");
+
+                address[0] = streetAndNr[0];
+                address[1] = streetAndNr[1];
+                address[2] = zipAndCity[0];
+                address[3] = zipAndCity[1];
+            }
+
+            return address;
         }
     }
 }
