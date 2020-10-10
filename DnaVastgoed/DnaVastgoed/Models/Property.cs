@@ -11,6 +11,8 @@ namespace DnaVastgoed.Models {
         public bool IsUploaded { get; set; }
 
         //Basic information
+        public PropertyStatus Status { get; set; }
+        public PropertyLabel Label { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
         public string Energy { get; set; }
@@ -20,7 +22,6 @@ namespace DnaVastgoed.Models {
         public string Rooms { get; set; }
         public string Bedrooms { get; set; }
         public string Bathrooms { get; set; }
-        public string Status { get; set; }
         public string EPCNumber { get; set; }
 
         //Necessary items for Belgian law
@@ -60,7 +61,7 @@ namespace DnaVastgoed.Models {
                     case "Slaapkamers": Bedrooms = value; break;
                     case "Badkamers": Bathrooms = value; break;
                     case "Prijs": Price = value; break;
-                    case "Pand Status": Status = value; break;
+                    case "Pand Status": if (value == "Te Koop") { Status = PropertyStatus.SALE; } else { Status = PropertyStatus.RENT; };  break;
                     case "EPC Certificaatnr": EPCNumber = value; break;
                     case "Katastraal Inkomen (KI)": Katastraalinkomen = value; break;
                     case "Orientatie achtergevel": OrientatieAchtergevel = value; break;
@@ -73,6 +74,12 @@ namespace DnaVastgoed.Models {
                     case "Risicozone voor overstromingen": RisicoOverstroming = value; break;
                     case "Afgebakend overstromingsgebied": AfgebakendOverstromingsGebied = value; break;
                 }
+            }
+
+            if (Price == "") {
+                Label = PropertyLabel.SOLD;
+            } else {
+                Label = PropertyLabel.ONLINE;
             }
         }
 
@@ -89,5 +96,15 @@ namespace DnaVastgoed.Models {
         public override string ToString() {
             return $"Property {Name} with ID: {Id}";
         }
+    }
+
+    public enum PropertyStatus {
+        RENT,
+        SALE
+    }
+
+    public enum PropertyLabel {
+        ONLINE,
+        SOLD
     }
 }
