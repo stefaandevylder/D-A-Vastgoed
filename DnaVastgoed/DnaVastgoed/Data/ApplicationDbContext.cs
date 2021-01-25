@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DnaVastgoed.Data {
 
-    class ApplicationDbContext : DbContext {
+    public class ApplicationDbContext : DbContext {
 
         public DbSet<Property> Properties { get; set; }
 

@@ -2,13 +2,13 @@
 
 namespace DnaVastgoed {
 
-    class StartUp {
+    public class StartUp {
         
-        //URL with a list (JSON) of all properties on that site.
-        private static readonly string BASE_URL = "http://134.209.94.232/wp-json/wp/v2/property?per_page=100&orderby=date";
-
+        /// <summary>
+        /// Start the program.
+        /// </summary>
         static async Task Main(string[] args) {
-            await new Program().Start(BASE_URL);
+            await new Program().Start();
         }
     }
 }

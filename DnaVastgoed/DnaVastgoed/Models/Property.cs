@@ -3,7 +3,7 @@ using AngleSharp.Html.Dom;
 
 namespace DnaVastgoed.Models {
 
-    class Property {
+    public class Property {
 
         //Identification
         public string Id { get; private set; }
@@ -36,11 +36,12 @@ namespace DnaVastgoed.Models {
         public string RisicoOverstroming { get; set; }
         public string AfgebakendOverstromingsGebied { get; set; }
 
-        /**
-         * Parses the HTML document to an entity.
-         * 
-         * ATTENTION: If the front-site changes, this should change too.
-         */
+        /// <summary>
+        /// Parses the HTML document to an entity.
+        /// 
+        /// ATTENTION: If the front-site changes, this should change too.
+        /// </summary>
+        /// <param name="document"></param>
         public void ParseFromHTML(IHtmlDocument document) {
             Name = GetText(document, "h1.property-title");
             Description = GetText(document, "div.description-inner");
@@ -78,16 +79,20 @@ namespace DnaVastgoed.Models {
             }
         }
 
-        /**
-         * To see if a detail exists on the page.
-         */
+        /// <summary>
+        /// To see if a detail exists on the page.
+        /// </summary>
+        /// <param name="document">The document we need to select from</param>
+        /// <param name="querySelector">The query selector</param>
+        /// <returns></returns>
         private string GetText(IHtmlDocument document, string querySelector) {
             return document.QuerySelector(querySelector) != null ? document.QuerySelector(querySelector).Text() : "";
         }
 
-        /**
-         * Needed for console writing.
-         */
+        /// <summary>
+        /// Needed for console writing.
+        /// </summary>
+        /// <returns>The property with the right ID</returns>
         public override string ToString() {
             return $"Property {Name} with ID: {Id}";
         }
