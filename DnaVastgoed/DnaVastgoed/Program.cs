@@ -90,7 +90,7 @@ namespace DnaVastgoed {
             Property property = new Property();
             property.ParseFromHTML(document);
 
-            Console.WriteLine("Received: " + property.ToString());
+            Console.WriteLine("Found: " + property.ToString());
 
             AddOrUpdateProperty(property);
         }

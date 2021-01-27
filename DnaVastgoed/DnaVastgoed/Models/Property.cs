@@ -1,5 +1,9 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace DnaVastgoed.Models {
 
@@ -7,10 +11,13 @@ namespace DnaVastgoed.Models {
 
         //Identification
         public string Id { get; private set; }
-        public string Name { get; set; }
-        public bool IsUploaded { get; set; }
+        public int ImmovlanId { get; set; }
+        public int RealoId { get; set; }
+        public DateTime LastUpdated { get; set; }
 
         //Basic information
+        public ICollection<PropertyImage> Images { get; set; }
+        public string Name { get; set; }
         public string Type { get; set; }
         public string Status { get; set; }
         public string Description { get; set; }
@@ -36,12 +43,13 @@ namespace DnaVastgoed.Models {
         public string RisicoOverstroming { get; set; }
         public string AfgebakendOverstromingsGebied { get; set; }
 
+
         /// <summary>
         /// Parses the HTML document to an entity.
         /// 
         /// ATTENTION: If the front-site changes, this should change too.
         /// </summary>
-        /// <param name="document"></param>
+        /// <param name="document">The document we need to parse</param>
         public void ParseFromHTML(IHtmlDocument document) {
             Name = GetText(document, "h1.property-title");
             Description = GetText(document, "div.description-inner");
@@ -52,8 +60,8 @@ namespace DnaVastgoed.Models {
             IHtmlCollection<IElement> detailsList = document.QuerySelectorAll("div.property-detail-detail ul li");
 
             foreach (var el in detailsList) {
-                string key = el.QuerySelector("div.text").Text().TrimEnd(':');
-                string value = el.QuerySelector("div.value").Text();
+                string key = GetText(el, "div.text").TrimEnd(':');
+                string value = GetText(el, "div.value");
 
                 switch (key) {
                     case "Pand ID": Id = value; break;
@@ -77,16 +85,33 @@ namespace DnaVastgoed.Models {
                     case "Afgebakend overstromingsgebied": AfgebakendOverstromingsGebied = value; break;
                 }
             }
+
+            Images = new List<PropertyImage>();
+            IHtmlCollection<IElement> images = document.QuerySelectorAll("div.list-gallery-property-v2 div.image-wrapper img");
+
+            foreach (var el in images) {
+                Images.Add(new PropertyImage() {
+                    Url = el.GetAttribute("data-src")
+                });
+            }
         }
 
         /// <summary>
-        /// To see if a detail exists on the page.
+        /// Get text from an element if existant.
         /// </summary>
-        /// <param name="document">The document we need to select from</param>
+        /// <param name="doc">The document we need to select from</param>
         /// <param name="querySelector">The query selector</param>
-        /// <returns></returns>
-        private string GetText(IHtmlDocument document, string querySelector) {
-            return document.QuerySelector(querySelector) != null ? document.QuerySelector(querySelector).Text() : "";
+        private string GetText(IHtmlDocument doc, string querySelector) {
+            return doc.QuerySelector(querySelector) != null ? Regex.Replace(doc.QuerySelector(querySelector).Text(), @"^\s+|\s+$|\s+(?=\s)", "") : "";
+        }
+
+        /// <summary>
+        /// Get text from an element if existant.
+        /// </summary>
+        /// <param name="el">The element we need to select from</param>
+        /// <param name="querySelector">The query selector</param>
+        private string GetText(IElement el, string querySelector) {
+            return el.QuerySelector(querySelector) != null ? Regex.Replace(el.QuerySelector(querySelector).Text(), @"^\s+|\s+$|\s+(?=\s)", "") : "";
         }
 
         /// <summary>
@@ -94,7 +119,36 @@ namespace DnaVastgoed.Models {
         /// </summary>
         /// <returns>The property with the right ID</returns>
         public override string ToString() {
-            return $"Property {Name} with ID: {Id}";
+            return $"Property {Name} with ID: {Id}" +
+                $"\nType: {Type}" +
+                $"\nStatus: {Status}" +
+                $"\nDesc: {Description}" +
+                $"\nLoc: {Location}" +
+                $"\nEnergy: {Energy}" +
+                $"\nPrice: {Price}" +
+                $"\nLot area: {LotArea}" +
+                $"\nLiving area: {LivingArea}" +
+                $"\nRooms: {Rooms}" +
+                $"\nBedrooms: {Bedrooms}" +
+                $"\nEPC nr: {EPCNumber}" +
+                $"\nKI: {KatastraalInkomen}" +
+                $"\nOrientatie achtergevel: {OrientatieAchtergevel}" +
+                $"\nElektriciteitskeuring: {Elektriciteitskeuring}" +
+                $"\nBouwvergunning: {Bouwvergunning}" +
+                $"\nStedenbouwkundig: {StedenbouwkundigeBestemming}" +
+                $"\nVerkavelings: {Verkavelingsvergunning}" +
+                $"\nDagvaarding: {Dagvaarding}" +
+                $"\nVerkooprecht: {Verkooprecht}" +
+                $"\nOverstroming: {RisicoOverstroming}" +
+                $"\nAfgebakend: {AfgebakendOverstromingsGebied}" +
+                $"\nImages: {string.Join(",", Images.Select(i => i.Url))}";
         }
+    }
+
+    public class PropertyImage {
+
+        public int Id { get; set; }
+        public string Url { get; set; }
+
     }
 }
