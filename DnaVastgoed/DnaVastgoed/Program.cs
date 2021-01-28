@@ -3,10 +3,11 @@ using Abot2.Poco;
 using AngleSharp.Html.Dom;
 using DnaVastgoed.Data;
 using DnaVastgoed.Models;
+using ImmoVlanAPI;
 using Newtonsoft.Json.Linq;
+using RealoAPI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -15,9 +16,21 @@ namespace DnaVastgoed {
     public class Program {
 
         private readonly string BASE_URL = "http://134.209.94.232/wp-json/wp/v2/property?per_page=100&orderby=date";
-
-        private ApplicationDbContext _database = new ApplicationDbContext();
         private ICollection<string> _links = new List<string>();
+
+        private readonly PropertyRepository _repo;
+
+        private readonly ImmoVlanClient _immovlanClient;
+        private readonly RealoClient _realoClient;
+
+        public Program() {
+            ApplicationDbContext context = new ApplicationDbContext();
+
+            _repo = new PropertyRepository(context);
+
+            _immovlanClient = new ImmoVlanClient("", "", 1, "", true);
+            _realoClient = new RealoClient("", "");
+        }
 
         /// <summary>
         /// Parse the properties from the base url, create a database
@@ -28,7 +41,7 @@ namespace DnaVastgoed {
             ParseJson(BASE_URL);
 
             Console.WriteLine("Creating database if needed...");
-            await _database.Database.EnsureCreatedAsync();
+            await _repo.CreateDatabase();
 
             Console.WriteLine("Started crawling...");
             await StartCrawler();
@@ -102,18 +115,22 @@ namespace DnaVastgoed {
         /// </summary>
         /// <param name="property">The property to insert</param>
         private void AddOrUpdateProperty(Property property) {
-            Property propertyFound = _database.Properties.FirstOrDefault(p => p == property);
+            Property propertyFound = _repo.Get(property.Id);
 
             if (propertyFound == null) {
-                _database.Properties.Add(property);
-                Console.WriteLine($"Added property {property.Id} to database, Immovlan & Realo.");
+                _repo.Add(property);
+                _repo.SaveChanges();
 
-                _database.SaveChanges();
+                Console.WriteLine($"Added property {property.Id} to database, Immovlan & Realo.");
             } else {
-                if (property == propertyFound) {
+                if (property.Equals(propertyFound)) {
                     Console.WriteLine($"Property {property.Id} already exists, skipping.");
                 } else {
-                    Console.WriteLine($"Property {property.Id} exists, but has to be updated.");
+                    _repo.Remove(propertyFound);
+                    _repo.Add(property);
+                    _repo.SaveChanges();
+
+                    Console.WriteLine($"Property {property.Id} exists, but has been updated.");
                 }
             }
         }

@@ -1,6 +1,5 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -13,10 +12,8 @@ namespace DnaVastgoed.Models {
         public string Id { get; private set; }
         public int ImmovlanId { get; set; }
         public int RealoId { get; set; }
-        public DateTime LastUpdated { get; set; }
 
         //Basic information
-        public ICollection<PropertyImage> Images { get; set; }
         public string Name { get; set; }
         public string Type { get; set; }
         public string Status { get; set; }
@@ -30,6 +27,7 @@ namespace DnaVastgoed.Models {
         public string Bedrooms { get; set; }
         public string Bathrooms { get; set; }
         public string EPCNumber { get; set; }
+        public ICollection<PropertyImage> Images { get; set; }
 
         //Necessary items for Belgian law
         public string KatastraalInkomen { get; set; }
@@ -43,6 +41,9 @@ namespace DnaVastgoed.Models {
         public string RisicoOverstroming { get; set; }
         public string AfgebakendOverstromingsGebied { get; set; }
 
+        public Property() {
+            Images = new List<PropertyImage>();
+        }
 
         /// <summary>
         /// Parses the HTML document to an entity.
@@ -71,7 +72,7 @@ namespace DnaVastgoed.Models {
                     case "Slaapkamers": Bedrooms = value; break;
                     case "Badkamers": Bathrooms = value; break;
                     case "Prijs": Price = value; break;
-                    case "Pand Status": Status = value;  break;
+                    case "Pand Status": Status = value; break;
                     case "EPC Certificaatnr": EPCNumber = value; break;
                     case "Katastraal Inkomen (KI)": KatastraalInkomen = value; break;
                     case "Orientatie achtergevel": OrientatieAchtergevel = value; break;
@@ -86,13 +87,10 @@ namespace DnaVastgoed.Models {
                 }
             }
 
-            Images = new List<PropertyImage>();
             IHtmlCollection<IElement> images = document.QuerySelectorAll("div.list-gallery-property-v2 div.image-wrapper img");
 
             foreach (var el in images) {
-                Images.Add(new PropertyImage() {
-                    Url = el.GetAttribute("data-src")
-                });
+                Images.Add(new PropertyImage(el.GetAttribute("data-src")));
             }
         }
 
@@ -112,6 +110,36 @@ namespace DnaVastgoed.Models {
         /// <param name="querySelector">The query selector</param>
         private string GetText(IElement el, string querySelector) {
             return el.QuerySelector(querySelector) != null ? Regex.Replace(el.QuerySelector(querySelector).Text(), @"^\s+|\s+$|\s+(?=\s)", "") : "";
+        }
+
+        /// <summary>
+        /// Compare two properties and check if they are the same.
+        /// </summary>
+        /// <param name="p">The property to check</param>
+        /// <returns>True if they are equal</returns>
+        public bool Equals(Property p) {
+            return p.Name == Name
+                && p.Type == Type
+                && p.Status == Status
+                && p.Description == Description
+                && p.Location == Location
+                && p.Energy == Energy
+                && p.Price == Price
+                && p.LotArea == LotArea
+                && p.LivingArea == LivingArea
+                && p.Rooms == Rooms
+                && p.Bedrooms == Bedrooms
+                && p.Bathrooms == Bathrooms
+                && p.EPCNumber == EPCNumber
+                && p.KatastraalInkomen == KatastraalInkomen
+                && p.OrientatieAchtergevel == OrientatieAchtergevel
+                && p.Elektriciteitskeuring == Elektriciteitskeuring
+                && p.StedenbouwkundigeBestemming == StedenbouwkundigeBestemming
+                && p.Verkavelingsvergunning == Verkavelingsvergunning
+                && p.Dagvaarding == Dagvaarding
+                && p.Verkooprecht == Verkooprecht
+                && p.RisicoOverstroming == RisicoOverstroming
+                && p.AfgebakendOverstromingsGebied == AfgebakendOverstromingsGebied;
         }
 
         /// <summary>
@@ -143,12 +171,7 @@ namespace DnaVastgoed.Models {
                 $"\nAfgebakend: {AfgebakendOverstromingsGebied}" +
                 $"\nImages: {string.Join(",", Images.Select(i => i.Url))}";
         }
-    }
-
-    public class PropertyImage {
-
-        public int Id { get; set; }
-        public string Url { get; set; }
 
     }
+
 }
