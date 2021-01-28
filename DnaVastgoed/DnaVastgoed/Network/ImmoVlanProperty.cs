@@ -4,13 +4,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace DnaVastgoed.Network {
 
     public class ImmoVlanProperty : NetworkProperty {
 
-        public async Task CreateImmoVlan(ImmoVlanClient client) {
+        /// <summary>
+        /// Create and publish a new ImmoVlan property.
+        /// </summary>
+        /// <param name="client">The Immovlan client</param>
+        public void CreateImmoVlan(ImmoVlanClient client) {
             Property prop = new Property("123", "123", CommercialStatus.ONLINE,
                 new Classification(GetTransactionType(), GetPropertyType(), true),
                 new Location(new Address(GetZipCode().ToString())),
@@ -30,7 +33,7 @@ namespace DnaVastgoed.Network {
                 }
             };
 
-            await client.PublishProperty(prop);
+            client.PublishProperty(prop);
         }
 
         /// <summary>

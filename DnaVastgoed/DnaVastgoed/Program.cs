@@ -3,6 +3,7 @@ using Abot2.Poco;
 using AngleSharp.Html.Dom;
 using DnaVastgoed.Data;
 using DnaVastgoed.Models;
+using DnaVastgoed.Network;
 using ImmoVlanAPI;
 using Newtonsoft.Json.Linq;
 using RealoAPI;
@@ -19,7 +20,6 @@ namespace DnaVastgoed {
         private ICollection<string> _links = new List<string>();
 
         private readonly PropertyRepository _repo;
-
         private readonly ImmoVlanClient _immovlanClient;
         private readonly RealoClient _realoClient;
 
@@ -120,6 +120,10 @@ namespace DnaVastgoed {
             if (propertyFound == null) {
                 _repo.Add(property);
                 _repo.SaveChanges();
+
+                // I know this seems weird but ill fix this once I have time
+                ((ImmoVlanProperty) property).CreateImmoVlan(_immovlanClient);
+                ((RealoProperty) property).CreateRealo(_realoClient, 1);
 
                 Console.WriteLine($"Added property {property.Id} to database, Immovlan & Realo.");
             } else {

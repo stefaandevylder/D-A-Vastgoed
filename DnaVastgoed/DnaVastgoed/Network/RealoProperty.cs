@@ -7,6 +7,11 @@ namespace DnaVastgoed.Network {
 
     public class RealoProperty : NetworkProperty {
 
+        /// <summary>
+        /// Create and publish a new Realo listing.
+        /// </summary>
+        /// <param name="client">The Realo client</param>
+        /// <param name="agencyId">The agency id</param>
         public void CreateRealo(RealoClient client, int agencyId) {
             Listing listing = new Listing(GetListingType(), GetListingWay());
 
