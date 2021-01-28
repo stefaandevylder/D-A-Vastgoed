@@ -28,8 +28,8 @@ namespace DnaVastgoed {
 
             _repo = new PropertyRepository(context);
 
-            _immovlanClient = new ImmoVlanClient("", "", 1, "", true);
-            _realoClient = new RealoClient("", "");
+            _immovlanClient = new ImmoVlanClient("dsfsdf", "sdf", 1, "sdf", true);
+            _realoClient = new RealoClient("public", "private", true);
         }
 
         /// <summary>
@@ -122,8 +122,8 @@ namespace DnaVastgoed {
                 _repo.SaveChanges();
 
                 // I know this seems weird but ill fix this once I have time
-                ((ImmoVlanProperty) property).CreateImmoVlan(_immovlanClient);
-                ((RealoProperty) property).CreateRealo(_realoClient, 1);
+                //((ImmoVlanProperty) property).CreateImmoVlan(_immovlanClient);
+                //((RealoProperty) property).CreateRealo(_realoClient, 1);
 
                 Console.WriteLine($"Added property {property.Id} to database, Immovlan & Realo.");
             } else {
