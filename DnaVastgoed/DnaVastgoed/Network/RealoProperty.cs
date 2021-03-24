@@ -1,11 +1,12 @@
-﻿using RealoAPI;
+﻿using DnaVastgoed.Models;
+using RealoAPI;
 using RealoAPI.Models;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace DnaVastgoed.Network {
 
-    public class RealoProperty : NetworkProperty {
+    public class RealoProperty : DnaProperty {
 
         /// <summary>
         /// Create and publish a new Realo listing.
@@ -20,7 +21,7 @@ namespace DnaVastgoed.Network {
             };
 
             listing.Address = new Address(Country.BE) {
-                PostalCode = GetZipCode().ToString()
+                PostalCode = ZipCode
             };
 
             listing.EnergyConsumption = float.Parse(GetEnergy());
@@ -40,13 +41,13 @@ namespace DnaVastgoed.Network {
         /// <returns>The Realo listing type</returns>
         private ListingType GetListingType() {
             switch (Type) {
-                case "Villa": return ListingType.HOUSE;
                 case "Woning": return ListingType.HOUSE;
                 case "Appartement": return ListingType.APARTMENT;
                 case "Assistentiewoning": return ListingType.MISCELLANEOUS;
                 case "Industrieel/Commercieel": return ListingType.INDUSTRIAL;
-                case "Grond/Buitenparking": return ListingType.NEWBUILD_PROJECT;
+                case "Grond": return ListingType.NEWBUILD_PROJECT;
                 case "Garage": return ListingType.PARKING;
+                case "Gemeubeld Appartement/Expats": return ListingType.APARTMENT;
             }
 
             return ListingType.MISCELLANEOUS;
@@ -58,21 +59,6 @@ namespace DnaVastgoed.Network {
         /// <returns>The proper listing way</returns>
         private ListingWay GetListingWay() {
             return Status == "Te Koop" ? ListingWay.SALE : ListingWay.RENT;
-        }
-
-        /// <summary>
-        /// Get the zipcode from a location.
-        /// </summary>
-        /// <returns>The zipcode</returns>
-        private int GetZipCode() {
-            if (Location.Contains("Beveren")) return 9120;
-            if (Location.Contains("Kemzeke")) return 9190;
-            if (Location.Contains("Nieuwkerken-Waas")) return 9100;
-            if (Location.Contains("Sint-Gillis-Waas")) return 9170;
-            if (Location.Contains("Sint-Niklaas")) return 9100;
-            if (Location.Contains("Vrasene")) return 9120;
-
-            return 9100;
         }
 
         /// <summary>

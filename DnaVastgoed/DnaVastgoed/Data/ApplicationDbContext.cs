@@ -5,7 +5,7 @@ namespace DnaVastgoed.Data {
 
     public class ApplicationDbContext : DbContext {
 
-        public DbSet<Property> Properties { get; set; }
+        public DbSet<DnaProperty> Properties { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder options)
             => options.UseSqlite("Data Source=Database.db");

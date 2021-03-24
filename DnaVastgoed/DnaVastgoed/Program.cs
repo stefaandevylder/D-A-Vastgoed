@@ -5,6 +5,7 @@ using DnaVastgoed.Data;
 using DnaVastgoed.Models;
 using DnaVastgoed.Network;
 using ImmoVlanAPI;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using RealoAPI;
 using System;
@@ -16,7 +17,9 @@ namespace DnaVastgoed {
 
     public class Program {
 
-        private readonly string BASE_URL = "http://134.209.94.232/wp-json/wp/v2/property?per_page=100&orderby=date";
+        private IConfiguration Configuration;
+
+        private readonly bool _staging = true;
         private ICollection<string> _links = new List<string>();
 
         private readonly PropertyRepository _repo;
@@ -24,12 +27,17 @@ namespace DnaVastgoed {
         private readonly RealoClient _realoClient;
 
         public Program() {
-            ApplicationDbContext context = new ApplicationDbContext();
+            Configuration = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddUserSecrets<Program>()
+                .Build();
 
+            ApplicationDbContext context = new ApplicationDbContext();
             _repo = new PropertyRepository(context);
 
-            _immovlanClient = new ImmoVlanClient("dsfsdf", "sdf", 1, "sdf", true);
-            _realoClient = new RealoClient("public", "private", true);
+            _immovlanClient = new ImmoVlanClient(Configuration["ImmoVlan:BusinessEmail"], 
+                Configuration["ImmoVlan:TechnicalEmail"], 2, Configuration["ImmoVlan:ProCustomerId"], _staging);
+            _realoClient = new RealoClient(Configuration["Realo:PublicKey"], Configuration["Realo:PrivateKey"], _staging);
         }
 
         /// <summary>
@@ -37,8 +45,8 @@ namespace DnaVastgoed {
         /// and start crawling the webpages for all extra information.
         /// </summary>
         public async Task Start() {
-            Console.WriteLine("Started parsing properties: " + BASE_URL);
-            ParseJson(BASE_URL);
+            Console.WriteLine("Started parsing properties: " + Configuration["BaseURL"]);
+            ParseJson(Configuration["BaseURL"]);
 
             Console.WriteLine("Creating database if needed...");
             await _repo.CreateDatabase();
@@ -100,7 +108,7 @@ namespace DnaVastgoed {
         private void PageCrawlCompleted(object sender, PageCrawlCompletedArgs e) {
             IHtmlDocument document = e.CrawledPage.AngleSharpHtmlDocument;
 
-            Property property = new Property();
+            DnaProperty property = new DnaProperty();
             property.ParseFromHTML(document);
 
             Console.WriteLine("Found: " + property.ToString());
@@ -114,16 +122,16 @@ namespace DnaVastgoed {
         /// services. (Updates will come soon)
         /// </summary>
         /// <param name="property">The property to insert</param>
-        private void AddOrUpdateProperty(Property property) {
-            Property propertyFound = _repo.Get(property.Id);
+        private void AddOrUpdateProperty(DnaProperty property) {
+            DnaProperty propertyFound = _repo.Get(property.Id);
 
             if (propertyFound == null) {
                 _repo.Add(property);
                 _repo.SaveChanges();
 
                 // I know this seems weird but ill fix this once I have time
-                //((ImmoVlanProperty) property).CreateImmoVlan(_immovlanClient);
-                //((RealoProperty) property).CreateRealo(_realoClient, 1);
+                ((ImmoVlanProperty) property).CreateImmoVlan(_immovlanClient);
+                ((RealoProperty) property).CreateRealo(_realoClient, 1);
 
                 Console.WriteLine($"Added property {property.Id} to database, Immovlan & Realo.");
             } else {

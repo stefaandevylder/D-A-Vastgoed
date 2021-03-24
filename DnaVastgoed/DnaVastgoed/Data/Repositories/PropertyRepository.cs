@@ -8,7 +8,7 @@ namespace DnaVastgoed.Data {
     public class PropertyRepository {
 
         private readonly ApplicationDbContext _context;
-        private readonly DbSet<Property> _properties;
+        private readonly DbSet<DnaProperty> _properties;
 
         public PropertyRepository(ApplicationDbContext context) {
             _context = context;
@@ -27,7 +27,7 @@ namespace DnaVastgoed.Data {
         /// </summary>
         /// <param name="propertyId">The property ID</param>
         /// <returns>The found property object or null</returns>
-        public Property Get(string propertyId) {
+        public DnaProperty Get(string propertyId) {
             return _properties.FirstOrDefault(p => p.Id == propertyId);
         }
 
@@ -35,7 +35,7 @@ namespace DnaVastgoed.Data {
         /// Add a new property to the database.
         /// </summary>
         /// <param name="property">The property to add</param>
-        public void Add(Property property) {
+        public void Add(DnaProperty property) {
             _properties.Add(property);
         }
 
@@ -43,7 +43,7 @@ namespace DnaVastgoed.Data {
         /// Remove a property from the database.
         /// </summary>
         /// <param name="property">The property we want to remove</param>
-        public void Remove(Property property) {
+        public void Remove(DnaProperty property) {
             _properties.Remove(property);
         }
 

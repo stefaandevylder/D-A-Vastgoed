@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace DnaVastgoed.Models {
 
-    public class Property {
+    public class DnaProperty {
 
         //Identification
         public string Id { get; private set; }
@@ -27,7 +27,22 @@ namespace DnaVastgoed.Models {
         public string Bedrooms { get; set; }
         public string Bathrooms { get; set; }
         public string EPCNumber { get; set; }
-        public ICollection<PropertyImage> Images { get; set; }
+        public ICollection<DnaPropertyImage> Images { get; set; }
+
+        public string ZipCode {
+            get {
+                if (Location.Contains("Antwerpen")) return "2000";
+                if (Location.Contains("Belsele")) return "9111";
+                if (Location.Contains("Beveren")) return "9120";
+                if (Location.Contains("Kemzeke")) return "9190";
+                if (Location.Contains("Nieuwkerken-Waas")) return "9100";
+                if (Location.Contains("Sint-Gillis-Waas")) return "9170";
+                if (Location.Contains("Sint-Niklaas")) return "9100";
+                if (Location.Contains("Vrasene")) return "9120";
+
+                return "9100";
+            }
+        }
 
         //Necessary items for Belgian law
         public string KatastraalInkomen { get; set; }
@@ -41,8 +56,8 @@ namespace DnaVastgoed.Models {
         public string RisicoOverstroming { get; set; }
         public string AfgebakendOverstromingsGebied { get; set; }
 
-        public Property() {
-            Images = new List<PropertyImage>();
+        public DnaProperty() {
+            Images = new List<DnaPropertyImage>();
         }
 
         /// <summary>
@@ -90,7 +105,7 @@ namespace DnaVastgoed.Models {
             IHtmlCollection<IElement> images = document.QuerySelectorAll("div.list-gallery-property-v2 div.image-wrapper img");
 
             foreach (var el in images) {
-                Images.Add(new PropertyImage(el.GetAttribute("data-src")));
+                Images.Add(new DnaPropertyImage(el.GetAttribute("data-src")));
             }
         }
 
@@ -117,7 +132,7 @@ namespace DnaVastgoed.Models {
         /// </summary>
         /// <param name="p">The property to check</param>
         /// <returns>True if they are equal</returns>
-        public bool Equals(Property p) {
+        public bool Equals(DnaProperty p) {
             return p.Name == Name
                 && p.Type == Type
                 && p.Status == Status
