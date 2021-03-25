@@ -17,9 +17,9 @@ namespace DnaVastgoed {
 
     public class Program {
 
+        private readonly bool STAGING = true;
         private IConfiguration Configuration;
 
-        private readonly bool _staging = true;
         private ICollection<string> _links = new List<string>();
 
         private readonly PropertyRepository _repo;
@@ -35,9 +35,10 @@ namespace DnaVastgoed {
             ApplicationDbContext context = new ApplicationDbContext();
             _repo = new PropertyRepository(context);
 
-            _immovlanClient = new ImmoVlanClient(Configuration["ImmoVlan:BusinessEmail"], 
-                Configuration["ImmoVlan:TechnicalEmail"], 2, Configuration["ImmoVlan:ProCustomerId"], _staging);
-            _realoClient = new RealoClient(Configuration["Realo:PublicKey"], Configuration["Realo:PrivateKey"], _staging);
+            _immovlanClient = new ImmoVlanClient(Configuration["ImmoVlan:BusinessEmail"],
+                Configuration["ImmoVlan:TechincalEmail"], int.Parse(Configuration["ImmoVlan:SoftwareId"]), 
+                Configuration["ImmoVlan:ProCustomerId"], Configuration["ImmoVlan:SoftwarePassword"], STAGING);
+            _realoClient = new RealoClient(Configuration["Realo:PublicKey"], Configuration["Realo:PrivateKey"], STAGING);
         }
 
         /// <summary>
@@ -123,27 +124,35 @@ namespace DnaVastgoed {
         /// </summary>
         /// <param name="property">The property to insert</param>
         private void AddOrUpdateProperty(DnaProperty property) {
-            DnaProperty propertyFound = _repo.Get(property.Id);
+            DnaProperty propertyFound = _repo.Get(property.Name);
 
-            if (propertyFound == null) {
-                _repo.Add(property);
-                _repo.SaveChanges();
-
-                // I know this seems weird but ill fix this once I have time
-                ((ImmoVlanProperty) property).CreateImmoVlan(_immovlanClient);
-                ((RealoProperty) property).CreateRealo(_realoClient, 1);
-
-                Console.WriteLine($"Added property {property.Id} to database, Immovlan & Realo.");
-            } else {
-                if (property.Equals(propertyFound)) {
-                    Console.WriteLine($"Property {property.Id} already exists, skipping.");
-                } else {
-                    _repo.Remove(propertyFound);
+            if (property.Price != null) {
+                if (propertyFound == null) {
                     _repo.Add(property);
                     _repo.SaveChanges();
 
-                    Console.WriteLine($"Property {property.Id} exists, but has been updated.");
+                    var result = new ImmoVlanProperty(property).Publish(_immovlanClient);
+                    Console.WriteLine(result.Content);
+
+                    // Realo is not active, it has not been paid for by this client.
+                    // new RealoProperty(property).Publish(_realoClient, 1);
+
+                    Console.WriteLine($"Added property {property.Name} to database & Immovlan.");
+                } else {
+                    if (!property.Equals(propertyFound)) {
+                        _repo.Remove(propertyFound);
+                        _repo.Add(property);
+                        _repo.SaveChanges();
+
+                        new ImmoVlanProperty(property).Publish(_immovlanClient);
+
+                        Console.WriteLine($"Property {property.Name} exists, but has been updated.");
+                    } else {
+                        Console.WriteLine($"Property {property.Name} already exists, skipping.");
+                    }
                 }
+            } else {
+                Console.WriteLine($"Property {property.Name} has price null, can't add to DB.");
             }
         }
     }

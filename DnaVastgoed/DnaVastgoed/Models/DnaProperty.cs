@@ -1,6 +1,8 @@
 ﻿using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -9,6 +11,7 @@ namespace DnaVastgoed.Models {
     public class DnaProperty {
 
         //Identification
+        [Key]
         public string Id { get; private set; }
         public int ImmovlanId { get; set; }
         public int RealoId { get; set; }
@@ -57,6 +60,8 @@ namespace DnaVastgoed.Models {
         public string AfgebakendOverstromingsGebied { get; set; }
 
         public DnaProperty() {
+            Id = (DateTime.Now.Ticks / TimeSpan.TicksPerSecond).ToString();
+
             Images = new List<DnaPropertyImage>();
         }
 
@@ -80,7 +85,6 @@ namespace DnaVastgoed.Models {
                 string value = GetText(el, "div.value");
 
                 switch (key) {
-                    case "Pand ID": Id = value; break;
                     case "Grondoppervlakte": LotArea = value; break;
                     case "Oppervlakte bewoonbaar": LivingArea = value; break;
                     case "Kamers": Rooms = value; break;

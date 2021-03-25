@@ -6,33 +6,40 @@ using System.Linq;
 
 namespace DnaVastgoed.Network {
 
-    public class RealoProperty : DnaProperty {
+    public class RealoProperty {
+
+        private readonly DnaProperty _prop;
+
+        public RealoProperty(DnaProperty prop) {
+            _prop = prop;
+        }
 
         /// <summary>
         /// Create and publish a new Realo listing.
         /// </summary>
         /// <param name="client">The Realo client</param>
         /// <param name="agencyId">The agency id</param>
-        public void CreateRealo(RealoClient client, int agencyId) {
+        /// <returns>True if the property has been uploaded</returns>
+        public bool Publish(RealoClient client, int agencyId) {
             Listing listing = new Listing(GetListingType(), GetListingWay());
 
             listing.Description = new Dictionary<string, string>() {
-                { Language.NL.ToString(), Description }
+                { Language.NL.ToString(), _prop.Description }
             };
 
             listing.Address = new Address(Country.BE) {
-                PostalCode = ZipCode
+                PostalCode = _prop.ZipCode
             };
 
             listing.EnergyConsumption = float.Parse(GetEnergy());
-            listing.EnergyCertificateNumber = EPCNumber;
-            listing.Price = int.Parse(Price);
+            listing.EnergyCertificateNumber = _prop.EPCNumber;
+            listing.Price = int.Parse(_prop.Price);
 
             //Post the listing
             int listingId = client.Listings.Add(listing, agencyId);
 
             //Publish the new listing
-            client.Listings.Publish(listingId);
+            return client.Listings.Publish(listingId);
         }
 
         /// <summary>
@@ -40,9 +47,11 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>The Realo listing type</returns>
         private ListingType GetListingType() {
-            switch (Type) {
+            switch (_prop.Type) {
                 case "Woning": return ListingType.HOUSE;
+                case "Huis": return ListingType.HOUSE;
                 case "Appartement": return ListingType.APARTMENT;
+                case "Studio": return ListingType.APARTMENT;
                 case "Assistentiewoning": return ListingType.MISCELLANEOUS;
                 case "Industrieel/Commercieel": return ListingType.INDUSTRIAL;
                 case "Grond": return ListingType.NEWBUILD_PROJECT;
@@ -58,7 +67,7 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>The proper listing way</returns>
         private ListingWay GetListingWay() {
-            return Status == "Te Koop" ? ListingWay.SALE : ListingWay.RENT;
+            return _prop.Status == "Te Koop" ? ListingWay.SALE : ListingWay.RENT;
         }
 
         /// <summary>
@@ -66,7 +75,7 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>The energy score</returns>
         private string GetEnergy() {
-            return Energy.Split(" ")[0];
+            return _prop.Energy.Split(" ")[0];
         }
 
         /// <summary>
@@ -76,7 +85,7 @@ namespace DnaVastgoed.Network {
         private ICollection<Picture> GetPictures() {
             ICollection<Picture> pictures = new List<Picture>();
 
-            foreach (string imageUrl in Images.Select(img => img.Url)) {
+            foreach (string imageUrl in _prop.Images.Select(img => img.Url)) {
                 pictures.Add(new Picture(imageUrl));
             }
 

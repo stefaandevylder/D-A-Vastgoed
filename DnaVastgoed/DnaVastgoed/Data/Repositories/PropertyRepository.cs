@@ -25,10 +25,10 @@ namespace DnaVastgoed.Data {
         /// <summary>
         /// Get a property by ID.
         /// </summary>
-        /// <param name="propertyId">The property ID</param>
+        /// <param name="propertyName">The property name</param>
         /// <returns>The found property object or null</returns>
-        public DnaProperty Get(string propertyId) {
-            return _properties.FirstOrDefault(p => p.Id == propertyId);
+        public DnaProperty Get(string propertyName) {
+            return _properties.FirstOrDefault(p => p.Name.ToLower() == propertyName.ToLower());
         }
 
         /// <summary>

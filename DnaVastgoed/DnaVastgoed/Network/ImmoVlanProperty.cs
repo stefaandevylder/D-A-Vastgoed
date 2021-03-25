@@ -1,36 +1,41 @@
 ﻿using DnaVastgoed.Models;
 using ImmoVlanAPI;
 using ImmoVlanAPI.Models;
+using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 
 namespace DnaVastgoed.Network {
 
-    public class ImmoVlanProperty : DnaProperty {
+    public class ImmoVlanProperty {
 
-        private readonly string PROPERTY_PRO_ID = "02";
-        private readonly string PROPERTY_SOFTWARE_ID = "02";
+        private readonly DnaProperty _prop;
+
+        public ImmoVlanProperty(DnaProperty prop) {
+            _prop = prop;
+        }
 
         /// <summary>
         /// Create and publish a new ImmoVlan property.
         /// </summary>
         /// <param name="client">The Immovlan client</param>
-        public void CreateImmoVlan(ImmoVlanClient client) {
-            Property prop = new Property(PROPERTY_PRO_ID, PROPERTY_SOFTWARE_ID, CommercialStatus.ONLINE,
-                new Classification(GetTransactionType(), GetPropertyType(), true),
-                new Location(new Address(ZipCode)),
-                new Description(Description, Description),
-                new FinancialDetails(decimal.Parse(Price))) {
+        /// <returns>The response</returns>
+        public IRestResponse Publish(ImmoVlanClient client) {
+            Property prop = new Property(_prop.Id, _prop.Id, CommercialStatus.ONLINE,
+                new Classification(GetTransactionType(), GetPropertyType()),
+                new Location(new Address(_prop.ZipCode)),
+                new Description(_prop.Description, _prop.Description),
+                new FinancialDetails(decimal.Parse(_prop.Price.Replace("€", "").Replace(".", "")), PriceType.AskedPrice)) {
                 GeneralInformation = new GeneralInformation() {
                     ContactEmail = "info@dnavastgoed.be",
                     ContactPhone = "037761922"
                 },
                 Certificates = new Certificates() {
                     Epc = new EPC() {
-                        Reference = EPCNumber,
-                        EnergyConsumption = GetEnergy()
+                        EnergyConsumption = GetEnergy().GetValueOrDefault()
                     }
                 },
                 Attachments = new Attachments() {
@@ -38,7 +43,7 @@ namespace DnaVastgoed.Network {
                 }
             };
 
-            client.PublishProperty(prop);
+            return client.PublishProperty(prop).Result;
         }
 
         /// <summary>
@@ -46,7 +51,7 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>An ImmoVlan transaction type</returns>
         private TransactionType GetTransactionType() {
-            return Status == "Te Koop" ? TransactionType.SALE : TransactionType.RENT;
+            return _prop.Status == "Te Koop" ? TransactionType.SALE : TransactionType.RENT;
         }
 
         /// <summary>
@@ -54,9 +59,11 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>An ImmoVlan property type</returns>
         private PropertyType GetPropertyType() {
-            switch (Type) {
+            switch (_prop.Type) {
                 case "Woning": return PropertyType.Residence;
+                case "Huis": return PropertyType.Residence;
                 case "Appartement": return PropertyType.FlatApartment;
+                case "Studio": return PropertyType.FlatStudio;
                 case "Assistentiewoning": return PropertyType.UnditerminedProperty;
                 case "Industrieel/Commercieel": return PropertyType.CommerceBuilding;
                 case "Grond": return PropertyType.DevelopmentSite;
@@ -71,8 +78,10 @@ namespace DnaVastgoed.Network {
         /// Gets the energy score.
         /// </summary>
         /// <returns>The energy score</returns>
-        private int GetEnergy() {
-            return int.Parse(Energy.Split(" ")[0]);
+        private int? GetEnergy() {
+            if (_prop.Energy == null || _prop.Energy == "")
+                return 0;
+            return int.Parse(_prop.Energy.Split(" ")[0]);
         }
 
         /// <summary>
@@ -82,10 +91,10 @@ namespace DnaVastgoed.Network {
         private Picture[] GetPictures() {
             ICollection<Picture> pictures = new List<Picture>();
 
-            for (int i = 1; i <= Images.Count(); i++) {
-                string imageUrl = Images.ToArray()[i].Url;
+            for (int i = 0; i < _prop.Images.Count(); i++) {
+                string imageUrl = _prop.Images.ToArray()[i].Url;
 
-                pictures.Add(new Picture(i, EncodeImage(imageUrl)));
+                pictures.Add(new Picture(i + 1, EncodeImage(imageUrl)));
             }
 
             return pictures.ToArray();
