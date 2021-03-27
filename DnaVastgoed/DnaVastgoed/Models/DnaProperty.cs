@@ -13,8 +13,8 @@ namespace DnaVastgoed.Models {
         //Identification
         [Key]
         public string Id { get; private set; }
-        public int ImmovlanId { get; set; }
-        public int RealoId { get; set; }
+        public string ImmovlanId { get; set; }
+        public string RealoId { get; set; }
 
         //Basic information
         public string Name { get; set; }
@@ -71,7 +71,9 @@ namespace DnaVastgoed.Models {
         /// ATTENTION: If the front-site changes, this should change too.
         /// </summary>
         /// <param name="document">The document we need to parse</param>
-        public void ParseFromHTML(IHtmlDocument document) {
+        /// <param name="replaceUrl">The old url to replace</param>
+        /// <param name="baseUrl">The new base url</param>
+        public void ParseFromHTML(IHtmlDocument document, string replaceUrl, string baseUrl) {
             Name = GetText(document, "h1.property-title");
             Description = GetText(document, "div.description-inner");
             Location = GetText(document, "div.property-location a");
@@ -109,7 +111,7 @@ namespace DnaVastgoed.Models {
             IHtmlCollection<IElement> images = document.QuerySelectorAll("div.list-gallery-property-v2 div.image-wrapper img");
 
             foreach (var el in images) {
-                Images.Add(new DnaPropertyImage(el.GetAttribute("data-src")));
+                Images.Add(new DnaPropertyImage(el.GetAttribute("data-src").Replace(replaceUrl, baseUrl)));
             }
         }
 

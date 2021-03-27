@@ -17,8 +17,11 @@ namespace DnaVastgoed {
 
     public class Program {
 
-        private readonly bool STAGING = true;
         private IConfiguration Configuration;
+
+        private readonly string URL_BASE = "http://104.248.85.244";
+        private readonly string URL_REPLACE = "https://dnavastgoed.be";
+        private readonly bool STAGING = false;
 
         private ICollection<string> _links = new List<string>();
 
@@ -36,7 +39,7 @@ namespace DnaVastgoed {
             _repo = new PropertyRepository(context);
 
             _immovlanClient = new ImmoVlanClient(Configuration["ImmoVlan:BusinessEmail"],
-                Configuration["ImmoVlan:TechincalEmail"], int.Parse(Configuration["ImmoVlan:SoftwareId"]), 
+                Configuration["ImmoVlan:TechincalEmail"], int.Parse(Configuration["ImmoVlan:SoftwareId"]),
                 Configuration["ImmoVlan:ProCustomerId"], Configuration["ImmoVlan:SoftwarePassword"], STAGING);
             _realoClient = new RealoClient(Configuration["Realo:PublicKey"], Configuration["Realo:PrivateKey"], STAGING);
         }
@@ -46,8 +49,8 @@ namespace DnaVastgoed {
         /// and start crawling the webpages for all extra information.
         /// </summary>
         public async Task Start() {
-            Console.WriteLine("Started parsing properties: " + Configuration["BaseURL"]);
-            ParseJson(Configuration["BaseURL"]);
+            Console.WriteLine("Started parsing properties: " + URL_BASE);
+            ParseJson(URL_BASE + "/wp-json/wp/v2/property?per_page=100&orderby=date");
 
             Console.WriteLine("Creating database if needed...");
             await _repo.CreateDatabase();
@@ -65,15 +68,19 @@ namespace DnaVastgoed {
         ///
         /// All custom fields are also not in this information.
         /// </summary>
-        /// <param name="baseUrl">The base URL we are going to parse</param>
-        private void ParseJson(string baseUrl) {
+        /// <param name="url">The URL we are going to parse</param>
+        private void ParseJson(string url) {
             HttpClient http = new HttpClient();
-            var rawData = http.GetAsync(baseUrl).Result.Content.ReadAsStringAsync().Result;
+
+            var rawData = http.GetAsync(url).Result.Content.ReadAsStringAsync().Result;
             var myJson = JArray.Parse(rawData);
 
             foreach (JObject item in myJson) {
-                _links.Add(item["link"].ToString());
-                Console.WriteLine($"Link added: {item["link"]}");
+                string link = item["link"].ToString().Replace(URL_REPLACE, URL_BASE);
+
+                _links.Add(link);
+
+                Console.WriteLine($"Link added: {link}");
             }
         }
 
@@ -95,6 +102,8 @@ namespace DnaVastgoed {
                 crawler = new PoliteWebCrawler(config);
                 crawler.PageCrawlCompleted += PageCrawlCompleted;
 
+                Console.WriteLine("Crawling link: " + link);
+
                 await crawler.CrawlAsync(new Uri(link));
             }
         }
@@ -110,7 +119,7 @@ namespace DnaVastgoed {
             IHtmlDocument document = e.CrawledPage.AngleSharpHtmlDocument;
 
             DnaProperty property = new DnaProperty();
-            property.ParseFromHTML(document);
+            property.ParseFromHTML(document, URL_REPLACE, URL_BASE);
 
             Console.WriteLine("Found: " + property.ToString());
 
@@ -131,11 +140,7 @@ namespace DnaVastgoed {
                     _repo.Add(property);
                     _repo.SaveChanges();
 
-                    var result = new ImmoVlanProperty(property).Publish(_immovlanClient);
-                    Console.WriteLine(result.Content);
-
-                    // Realo is not active, it has not been paid for by this client.
-                    // new RealoProperty(property).Publish(_realoClient, 1);
+                    PublishProperty(property);
 
                     Console.WriteLine($"Added property {property.Name} to database & Immovlan.");
                 } else {
@@ -144,7 +149,7 @@ namespace DnaVastgoed {
                         _repo.Add(property);
                         _repo.SaveChanges();
 
-                        new ImmoVlanProperty(property).Publish(_immovlanClient);
+                        PublishProperty(property);
 
                         Console.WriteLine($"Property {property.Name} exists, but has been updated.");
                     } else {
@@ -152,8 +157,22 @@ namespace DnaVastgoed {
                     }
                 }
             } else {
-                Console.WriteLine($"Property {property.Name} has price null, can't add to DB.");
+                Console.WriteLine($"Property {property.Name} has price null, did not add to DB.");
             }
+
+            Console.WriteLine("--------------------");
+        }
+
+        /// <summary>
+        /// Publishes a property to the right API's.
+        /// </summary>
+        /// <param name="property">The local D&A properties</param>
+        private void PublishProperty(DnaProperty property) {
+            var result = new ImmoVlanProperty(property).Publish(_immovlanClient);
+            Console.WriteLine(result.Content);
+
+            // Realo is not active, it has not been paid for by this client.
+            // new RealoProperty(property).Publish(_realoClient, 1);
         }
     }
 }
