@@ -86,13 +86,13 @@ namespace DnaVastgoed {
 
         /// <summary>
         /// Starts the crawler to crawl found pages.
-        /// It takes 1 second per page to ensure it does not lock
+        /// It takes 0.1 second per page to ensure it does not lock
         /// us out and we can keep crawling the site?
         /// </summary>
         private async Task StartCrawler() {
             var config = new CrawlConfiguration {
                 MaxPagesToCrawl = 1,
-                MinCrawlDelayPerDomainMilliSeconds = 100
+                MinCrawlDelayPerDomainMilliSeconds = 10
             };
 
             var crawler = new PoliteWebCrawler(config);
@@ -157,7 +157,7 @@ namespace DnaVastgoed {
                     }
                 }
             } else {
-                Console.WriteLine($"Property {property.Name} has price null, did not add to DB.");
+                Console.WriteLine($"Property {property.Name} has no price, did not add.");
             }
 
             Console.WriteLine("--------------------");

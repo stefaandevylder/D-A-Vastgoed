@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 
 namespace DnaVastgoed.Network {
 
@@ -24,9 +23,9 @@ namespace DnaVastgoed.Network {
         /// <param name="client">The Immovlan client</param>
         /// <returns>The response</returns>
         public IRestResponse Publish(ImmoVlanClient client) {
-            Property prop = new Property(_prop.Id, _prop.Id, CommercialStatus.ONLINE,
+            Property prop = new Property(_prop.Id, _prop.Id, GetCommercialStatus(),
                 new Classification(GetTransactionType(), GetPropertyType()),
-                new Location(new Address(_prop.ZipCode)),
+                new Location(new Address(_prop.ZipCode, GetLocation()[0], GetLocation()[1], null, GetLocation()[3])),
                 new Description(_prop.Description, _prop.Description),
                 new FinancialDetails(decimal.Parse(_prop.Price.Replace("€", "").Replace(".", "")), PriceType.AskedPrice)) {
                 GeneralInformation = new GeneralInformation() {
@@ -47,11 +46,37 @@ namespace DnaVastgoed.Network {
         }
 
         /// <summary>
+        /// Gets the commercial status of a property.
+        /// </summary>
+        /// <returns>The correct status</returns>
+        private CommercialStatus GetCommercialStatus() {
+            return _prop.Status == "Verkocht" || _prop.Status == "Verhuurd" ? CommercialStatus.SOLD : CommercialStatus.ONLINE;
+        }
+
+        /// <summary>
         /// Gets the transaction type.
         /// </summary>
         /// <returns>An ImmoVlan transaction type</returns>
         private TransactionType GetTransactionType() {
             return _prop.Status == "Te Koop" ? TransactionType.SALE : TransactionType.RENT;
+        }
+
+        /// <summary>
+        /// Get the location chopped up in a string.
+        /// 
+        /// 0: STREET
+        /// 1: NUMBER
+        /// 2: ZIP CODE
+        /// 3: CITY
+        /// </summary>
+        /// <returns></returns>
+        private string[] GetLocation() {
+            string[] streetAndCity = _prop.Location.Split(",");
+
+            string[] streetAndNumber = streetAndCity[0].Split(" ");
+            string[] zipAndCity = streetAndCity[1].Split(" ");
+
+            return new string[] { streetAndNumber[0], streetAndNumber[1], zipAndCity[0], zipAndCity[1] };
         }
 
         /// <summary>
