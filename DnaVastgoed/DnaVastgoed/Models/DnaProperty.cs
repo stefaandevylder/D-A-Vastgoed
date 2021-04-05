@@ -42,6 +42,7 @@ namespace DnaVastgoed.Models {
                 if (Location.Contains("Sint-Gillis-Waas")) return "9170";
                 if (Location.Contains("Sint-Niklaas")) return "9100";
                 if (Location.Contains("Vrasene")) return "9120";
+                if (Location.Contains("Bazel")) return "9150";
 
                 return "9100";
             }
