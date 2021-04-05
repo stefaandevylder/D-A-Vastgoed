@@ -86,13 +86,13 @@ namespace DnaVastgoed {
 
         /// <summary>
         /// Starts the crawler to crawl found pages.
-        /// It takes 0.1 second per page to ensure it does not lock
+        /// It takes 1 second per page to ensure it does not lock
         /// us out and we can keep crawling the site?
         /// </summary>
         private async Task StartCrawler() {
             var config = new CrawlConfiguration {
                 MaxPagesToCrawl = 1,
-                MinCrawlDelayPerDomainMilliSeconds = 10
+                MinCrawlDelayPerDomainMilliSeconds = 100
             };
 
             var crawler = new PoliteWebCrawler(config);
