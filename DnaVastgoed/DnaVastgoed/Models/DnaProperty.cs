@@ -32,22 +32,6 @@ namespace DnaVastgoed.Models {
         public string EPCNumber { get; set; }
         public ICollection<DnaPropertyImage> Images { get; set; }
 
-        public string ZipCode {
-            get {
-                if (Location.Contains("Antwerpen")) return "2000";
-                if (Location.Contains("Belsele")) return "9111";
-                if (Location.Contains("Beveren")) return "9120";
-                if (Location.Contains("Kemzeke")) return "9190";
-                if (Location.Contains("Nieuwkerken-Waas")) return "9100";
-                if (Location.Contains("Sint-Gillis-Waas")) return "9170";
-                if (Location.Contains("Sint-Niklaas")) return "9100";
-                if (Location.Contains("Vrasene")) return "9120";
-                if (Location.Contains("Bazel")) return "9150";
-
-                return "9100";
-            }
-        }
-
         //Necessary items for Belgian law
         public string KatastraalInkomen { get; set; }
         public string OrientatieAchtergevel { get; set; }
