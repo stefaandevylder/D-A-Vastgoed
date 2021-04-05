@@ -92,7 +92,7 @@ namespace DnaVastgoed {
         private async Task StartCrawler() {
             var config = new CrawlConfiguration {
                 MaxPagesToCrawl = 1,
-                MinCrawlDelayPerDomainMilliSeconds = 100
+                MinCrawlDelayPerDomainMilliSeconds = 1000
             };
 
             var crawler = new PoliteWebCrawler(config);
