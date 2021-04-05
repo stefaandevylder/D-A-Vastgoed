@@ -27,9 +27,9 @@ namespace DnaVastgoed.Network {
                 { Language.NL.ToString(), _prop.Description }
             };
 
-            listing.Address = new Address(Country.BE) {
-                PostalCode = _prop.ZipCode
-            };
+            //listing.Address = new Address(Country.BE) {
+            //    PostalCode = _prop.ZipCode
+            //};
 
             listing.EnergyConsumption = float.Parse(GetEnergy());
             listing.EnergyCertificateNumber = _prop.EPCNumber;
