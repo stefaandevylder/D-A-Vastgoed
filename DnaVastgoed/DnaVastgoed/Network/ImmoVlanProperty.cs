@@ -73,7 +73,7 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns></returns>
         private string[] GetLocation() {
-            string[] streetAndCity = _prop.Location.Split(",");
+            string[] streetAndCity = _prop.Location.Split(", ");
 
             string[] streetAndNumber = streetAndCity[0].Split(" ");
             string[] zipAndCity = streetAndCity[1].Split(" ");
