@@ -25,7 +25,9 @@ namespace DnaVastgoed.Network {
         public IRestResponse Publish(ImmoVlanClient client) {
             Property prop = new Property(_prop.Id, _prop.Id, GetCommercialStatus(),
                 new Classification(GetTransactionType(), GetPropertyType()),
-                new Location(new Address(GetLocation()[2], GetLocation()[0], GetLocation()[1], null, GetLocation()[3])),
+                new Location(new Address(GetLocation()[2], GetLocation()[0], GetLocation()[1], null, GetLocation()[3])) {
+                    IsAddressDisplayed = true
+                },
                 new Description(_prop.Description, _prop.Description),
                 new FinancialDetails(decimal.Parse(_prop.Price.Replace("€", "").Replace(".", "")), PriceType.AskedPrice)) {
                 GeneralInformation = new GeneralInformation() {

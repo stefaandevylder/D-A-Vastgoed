@@ -86,13 +86,13 @@ namespace DnaVastgoed {
 
         /// <summary>
         /// Starts the crawler to crawl found pages.
-        /// It takes 1 second per page to ensure it does not lock
+        /// It takes 0.1 second per page to ensure it does not lock
         /// us out and we can keep crawling the site?
         /// </summary>
         private async Task StartCrawler() {
             var config = new CrawlConfiguration {
                 MaxPagesToCrawl = 1,
-                MinCrawlDelayPerDomainMilliSeconds = 1000
+                MinCrawlDelayPerDomainMilliSeconds = 10
             };
 
             var crawler = new PoliteWebCrawler(config);
@@ -141,8 +141,7 @@ namespace DnaVastgoed {
                     _repo.SaveChanges();
 
                     PublishProperty(property);
-
-                    Console.WriteLine($"Added property {property.Name} to database & Immovlan.");
+                    PrintSuccess($"Added property {property.Name} to database & Immovlan.");
                 } else {
                     if (!property.Equals(propertyFound)) {
                         _repo.Remove(propertyFound);
@@ -150,14 +149,13 @@ namespace DnaVastgoed {
                         _repo.SaveChanges();
 
                         PublishProperty(property);
-
-                        Console.WriteLine($"Property {property.Name} exists, but has been updated.");
+                        PrintSuccess($"Property {property.Name} exists, but has been updated.");
                     } else {
-                        Console.WriteLine($"Property {property.Name} already exists, skipping.");
+                        PrintError($"Property {property.Name} already exists, skipping.");
                     }
                 }
             } else {
-                Console.WriteLine($"Property {property.Name} has no price, did not add.");
+                PrintError($"Property {property.Name} has no price, did not add.");
             }
 
             Console.WriteLine("--------------------");
@@ -173,6 +171,26 @@ namespace DnaVastgoed {
 
             // Realo is not active, it has not been paid for by this client.
             // new RealoProperty(property).Publish(_realoClient, 1);
+        }
+
+        /// <summary>
+        /// Print a success message to the console.
+        /// </summary>
+        /// <param name="text">The given text.</param>
+        private void PrintSuccess(string text) {
+            Console.BackgroundColor = ConsoleColor.Green;
+            Console.WriteLine(text);
+            Console.ResetColor();
+        }
+
+        /// <summary>
+        /// Print an error message to the console.
+        /// </summary>
+        /// <param name="text">The given text.</param>
+        private void PrintError(string text) {
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.WriteLine(text);
+            Console.ResetColor();
         }
     }
 }
