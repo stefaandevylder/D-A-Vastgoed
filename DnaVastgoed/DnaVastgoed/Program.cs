@@ -144,12 +144,34 @@ namespace DnaVastgoed {
                     PrintSuccess($"Added property {property.Name} to database & Immovlan.");
                 } else {
                     if (!property.Equals(propertyFound)) {
-                        _repo.Remove(propertyFound);
-                        _repo.Add(property);
+                        propertyFound.Name = property.Name;
+                        propertyFound.Type = property.Type;
+                        propertyFound.Status = property.Status;
+                        propertyFound.Description = property.Description;
+                        propertyFound.Location = property.Location;
+                        propertyFound.Energy = property.Energy;
+                        propertyFound.Price = property.Price;
+                        propertyFound.LotArea = property.LotArea;
+                        propertyFound.LivingArea = property.LivingArea;
+                        propertyFound.Rooms = property.Rooms;
+                        propertyFound.Bedrooms = property.Bedrooms;
+                        propertyFound.Bathrooms = property.Bathrooms;
+                        propertyFound.EPCNumber = property.EPCNumber;
+                        propertyFound.KatastraalInkomen = property.KatastraalInkomen;
+                        propertyFound.OrientatieAchtergevel = property.OrientatieAchtergevel;
+                        propertyFound.Elektriciteitskeuring = property.Elektriciteitskeuring;
+                        propertyFound.Bouwvergunning = property.Bouwvergunning;
+                        propertyFound.StedenbouwkundigeBestemming = property.StedenbouwkundigeBestemming;
+                        propertyFound.Verkavelingsvergunning = property.Verkavelingsvergunning;
+                        propertyFound.Dagvaarding = property.Dagvaarding;
+                        propertyFound.Verkooprecht = property.Verkooprecht;
+                        propertyFound.RisicoOverstroming = property.RisicoOverstroming;
+                        propertyFound.AfgebakendOverstromingsGebied = property.AfgebakendOverstromingsGebied;
+
                         _repo.SaveChanges();
 
-                        PublishProperty(property);
-                        PrintSuccess($"Property {property.Name} exists, but has been updated.");
+                        PublishProperty(propertyFound);
+                        PrintSuccess($"Property {propertyFound.Name} exists, but has been updated.");
                     } else {
                         PrintError($"Property {property.Name} already exists, skipping.");
                     }
