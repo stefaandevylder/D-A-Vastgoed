@@ -52,7 +52,7 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>The correct status</returns>
         private CommercialStatus GetCommercialStatus() {
-            return _prop.Status == "Verkocht" || _prop.Status == "Verhuurd" ? CommercialStatus.SOLD : CommercialStatus.ONLINE;
+            return _prop.Status.Contains("Verkocht") || _prop.Status.Contains("Verhuurd") ? CommercialStatus.SOLD : CommercialStatus.ONLINE;
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>An ImmoVlan transaction type</returns>
         private TransactionType GetTransactionType() {
-            return _prop.Status == "Te Koop" ? TransactionType.SALE : TransactionType.RENT;
+            return _prop.Status.Contains("Te Koop") ? TransactionType.SALE : TransactionType.RENT;
         }
 
         /// <summary>
