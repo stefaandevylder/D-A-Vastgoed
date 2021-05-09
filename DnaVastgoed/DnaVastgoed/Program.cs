@@ -153,7 +153,6 @@ namespace DnaVastgoed {
                     propertyFound.Description = property.Description;
                     propertyFound.Location = property.Location;
                     propertyFound.Energy = property.Energy;
-                    propertyFound.Price = property.Price;
                     propertyFound.LotArea = property.LotArea;
                     propertyFound.LivingArea = property.LivingArea;
                     propertyFound.Rooms = property.Rooms;
@@ -170,6 +169,10 @@ namespace DnaVastgoed {
                     propertyFound.Verkooprecht = property.Verkooprecht;
                     propertyFound.RisicoOverstroming = property.RisicoOverstroming;
                     propertyFound.AfgebakendOverstromingsGebied = property.AfgebakendOverstromingsGebied;
+
+                    if (property.Price != null) {
+                        propertyFound.Price = property.Price;
+                    }
 
                     _repo.SaveChanges();
 
