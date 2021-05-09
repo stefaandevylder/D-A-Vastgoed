@@ -135,49 +135,49 @@ namespace DnaVastgoed {
         private void AddOrUpdateProperty(DnaProperty property) {
             DnaProperty propertyFound = _repo.Get(property.Name);
 
-            if (property.Price != null) {
-                if (propertyFound == null) {
+            if (propertyFound == null) {
+                if (property.Price != null) {
                     _repo.Add(property);
                     _repo.SaveChanges();
 
                     PublishProperty(property);
                     PrintSuccess($"Added property {property.Name} to database & Immovlan.");
                 } else {
-                    if (!property.Equals(propertyFound)) {
-                        propertyFound.Name = property.Name;
-                        propertyFound.Type = property.Type;
-                        propertyFound.Status = property.Status;
-                        propertyFound.Description = property.Description;
-                        propertyFound.Location = property.Location;
-                        propertyFound.Energy = property.Energy;
-                        propertyFound.Price = property.Price;
-                        propertyFound.LotArea = property.LotArea;
-                        propertyFound.LivingArea = property.LivingArea;
-                        propertyFound.Rooms = property.Rooms;
-                        propertyFound.Bedrooms = property.Bedrooms;
-                        propertyFound.Bathrooms = property.Bathrooms;
-                        propertyFound.EPCNumber = property.EPCNumber;
-                        propertyFound.KatastraalInkomen = property.KatastraalInkomen;
-                        propertyFound.OrientatieAchtergevel = property.OrientatieAchtergevel;
-                        propertyFound.Elektriciteitskeuring = property.Elektriciteitskeuring;
-                        propertyFound.Bouwvergunning = property.Bouwvergunning;
-                        propertyFound.StedenbouwkundigeBestemming = property.StedenbouwkundigeBestemming;
-                        propertyFound.Verkavelingsvergunning = property.Verkavelingsvergunning;
-                        propertyFound.Dagvaarding = property.Dagvaarding;
-                        propertyFound.Verkooprecht = property.Verkooprecht;
-                        propertyFound.RisicoOverstroming = property.RisicoOverstroming;
-                        propertyFound.AfgebakendOverstromingsGebied = property.AfgebakendOverstromingsGebied;
-
-                        _repo.SaveChanges();
-
-                        PublishProperty(propertyFound);
-                        PrintSuccess($"Property {propertyFound.Name} exists, but has been updated.");
-                    } else {
-                        PrintError($"Property {property.Name} already exists, skipping.");
-                    }
+                    PrintError($"Property {property.Name} is new without price, did not add.");
                 }
             } else {
-                PrintError($"Property {property.Name} has no price, did not add.");
+                if (!property.Equals(propertyFound)) {
+                    propertyFound.Name = property.Name;
+                    propertyFound.Type = property.Type;
+                    propertyFound.Status = property.Status;
+                    propertyFound.Description = property.Description;
+                    propertyFound.Location = property.Location;
+                    propertyFound.Energy = property.Energy;
+                    propertyFound.Price = property.Price;
+                    propertyFound.LotArea = property.LotArea;
+                    propertyFound.LivingArea = property.LivingArea;
+                    propertyFound.Rooms = property.Rooms;
+                    propertyFound.Bedrooms = property.Bedrooms;
+                    propertyFound.Bathrooms = property.Bathrooms;
+                    propertyFound.EPCNumber = property.EPCNumber;
+                    propertyFound.KatastraalInkomen = property.KatastraalInkomen;
+                    propertyFound.OrientatieAchtergevel = property.OrientatieAchtergevel;
+                    propertyFound.Elektriciteitskeuring = property.Elektriciteitskeuring;
+                    propertyFound.Bouwvergunning = property.Bouwvergunning;
+                    propertyFound.StedenbouwkundigeBestemming = property.StedenbouwkundigeBestemming;
+                    propertyFound.Verkavelingsvergunning = property.Verkavelingsvergunning;
+                    propertyFound.Dagvaarding = property.Dagvaarding;
+                    propertyFound.Verkooprecht = property.Verkooprecht;
+                    propertyFound.RisicoOverstroming = property.RisicoOverstroming;
+                    propertyFound.AfgebakendOverstromingsGebied = property.AfgebakendOverstromingsGebied;
+
+                    _repo.SaveChanges();
+
+                    PublishProperty(propertyFound);
+                    PrintSuccess($"Property {propertyFound.Name} exists, but has been updated.");
+                } else {
+                    PrintError($"Property {property.Name} already exists, skipping.");
+                }
             }
 
             Console.WriteLine("--------------------");
