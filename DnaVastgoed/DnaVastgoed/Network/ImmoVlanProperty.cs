@@ -29,7 +29,7 @@ namespace DnaVastgoed.Network {
                     IsAddressDisplayed = true
                 },
                 new Description(_prop.Description, _prop.Description),
-                new FinancialDetails(decimal.Parse(_prop.Price.Replace("€", "").Replace(".", "")), PriceType.AskedPrice)) {
+                new FinancialDetails(GetPrice(), PriceType.AskedPrice)) {
                 GeneralInformation = new GeneralInformation() {
                     ContactEmail = "info@dnavastgoed.be",
                     ContactPhone = "037761922"
@@ -79,6 +79,16 @@ namespace DnaVastgoed.Network {
             string[] zipAndCity = streetAndCity[1].Split(" ");
 
             return new string[] { streetAndNumber[0], streetAndNumber[1], zipAndCity[0], zipAndCity[1] };
+        }
+
+        /// <summary>
+        /// Get the price of the property.
+        /// </summary>
+        /// <returns>The decimal price form</returns>
+        private decimal GetPrice() {
+            if (_prop.Price == null) return 0;
+
+            return decimal.Parse(_prop.Price.Replace("€", "").Replace(".", "");
         }
 
         /// <summary>
