@@ -88,7 +88,7 @@ namespace DnaVastgoed.Network {
         private decimal GetPrice() {
             if (_prop.Price == null) return 0;
 
-            return decimal.Parse(_prop.Price.Replace("€", "").Replace(".", "");
+            return decimal.Parse(_prop.Price.Replace("€", "").Replace(".", ""));
         }
 
         /// <summary>
