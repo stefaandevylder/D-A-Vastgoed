@@ -86,7 +86,7 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>The decimal price form</returns>
         private decimal GetPrice() {
-            if (_prop.Price == null) return 0;
+            if (string.IsNullOrEmpty(_prop.Price)) return 0;
 
             return decimal.Parse(_prop.Price.Replace("€", "").Replace(".", ""));
         }
