@@ -106,6 +106,7 @@ namespace DnaVastgoed.Network {
                 case "Grond": return PropertyType.DevelopmentSite;
                 case "Garage": return PropertyType.GarageBuilding;
                 case "Gemeubeld Appartement/Expats": return PropertyType.FlatApartment;
+                case "Opbrengsteigendom": return PropertyType.ReturnBuilding;
             }
 
             return PropertyType.UnditerminedProperty;
