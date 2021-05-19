@@ -60,7 +60,7 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>An ImmoVlan transaction type</returns>
         private TransactionType GetTransactionType() {
-            return _prop.Status.Contains("Te Koop") ? TransactionType.SALE : TransactionType.RENT;
+            return _prop.Status.Contains("Verkocht") || _prop.Status.Contains("Te Koop") ? TransactionType.SALE : TransactionType.RENT;
         }
 
         /// <summary>
