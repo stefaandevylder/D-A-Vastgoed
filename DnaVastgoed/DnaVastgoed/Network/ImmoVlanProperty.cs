@@ -108,6 +108,7 @@ namespace DnaVastgoed.Network {
                 case "Gemeubeld Appartement/Expats": return PropertyType.FlatApartment;
                 case "Opbrengsteigendom": return PropertyType.ReturnBuilding;
                 case "Landhuis": return PropertyType.Villa;
+                case "Bouwgrond": return PropertyType.DevelopmentSite;
             }
 
             return PropertyType.UnditerminedProperty;
