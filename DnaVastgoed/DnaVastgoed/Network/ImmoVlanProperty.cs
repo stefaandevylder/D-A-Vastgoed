@@ -131,7 +131,7 @@ namespace DnaVastgoed.Network {
         private Picture[] GetPictures() {
             ICollection<Picture> pictures = new List<Picture>();
 
-            for (int i = 0; i < _prop.Images.Count(); i++) {
+            for (int i = 0; i < _prop.Images.Take(31).Count(); i++) {
                 string imageUrl = _prop.Images.ToArray()[i].Url;
 
                 pictures.Add(new Picture(i + 1, EncodeImage(imageUrl)));
