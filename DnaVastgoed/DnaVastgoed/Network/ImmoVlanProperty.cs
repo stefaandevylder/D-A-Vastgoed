@@ -129,7 +129,6 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>An array of picture objects</returns>
         private Picture[] GetPictures() {
-            Console.WriteLine("Pictures debug " + _prop.Images.Count());
             ICollection<Picture> pictures = new List<Picture>();
 
             for (int i = 0; i < _prop.Images.Take(31).Count(); i++) {
@@ -149,12 +148,8 @@ namespace DnaVastgoed.Network {
         private string EncodeImage(string imageUrl) {
             using (WebClient webClient = new WebClient()) {
                 byte[] data = webClient.DownloadData(imageUrl);
-                string baseData = Convert.ToBase64String(data);
-
-                Console.WriteLine("Loading image: " + imageUrl);
-                Console.WriteLine("Loading image data: " + baseData.Substring(0, 10));
-
-                return baseData;
+                
+                return Convert.ToBase64String(data);
             }
         }
 
