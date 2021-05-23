@@ -96,7 +96,6 @@ namespace DnaVastgoed.Models {
             IHtmlCollection<IElement> images = document.QuerySelectorAll("div.list-gallery-property-v2 div.image-wrapper img");
 
             foreach (var el in images) {
-                Console.WriteLine("Added new images: " + el.GetAttribute("data-src"));
                 Images.Add(new DnaPropertyImage(el.GetAttribute("data-src").Replace(replaceUrl, baseUrl)));
             }
         }

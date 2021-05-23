@@ -170,6 +170,7 @@ namespace DnaVastgoed {
                     propertyFound.Verkooprecht = property.Verkooprecht;
                     propertyFound.RisicoOverstroming = property.RisicoOverstroming;
                     propertyFound.AfgebakendOverstromingsGebied = property.AfgebakendOverstromingsGebied;
+                    propertyFound.Images = property.Images;
 
                     _repo.SaveChanges();
 
