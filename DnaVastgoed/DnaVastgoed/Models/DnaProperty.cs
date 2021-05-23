@@ -95,14 +95,10 @@ namespace DnaVastgoed.Models {
 
             IHtmlCollection<IElement> images = document.QuerySelectorAll("div.list-gallery-property-v2 div.image-wrapper img");
 
-            Console.WriteLine("Before images clear: " + Images.Count());
-            Images.Clear();
-            Console.WriteLine("After images clear: " + Images.Count());
-
             foreach (var el in images) {
+                Console.WriteLine("Added new images: " + el.GetAttribute("data-src"));
                 Images.Add(new DnaPropertyImage(el.GetAttribute("data-src").Replace(replaceUrl, baseUrl)));
             }
-            Console.WriteLine("Added new images: " + Images.Count());
         }
 
         /// <summary>
