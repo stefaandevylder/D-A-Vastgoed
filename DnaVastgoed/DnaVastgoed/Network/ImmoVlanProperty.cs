@@ -129,6 +129,7 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>An array of picture objects</returns>
         private Picture[] GetPictures() {
+            Console.WriteLine("Pictures debug");
             ICollection<Picture> pictures = new List<Picture>();
 
             for (int i = 0; i < _prop.Images.Take(31).Count(); i++) {
