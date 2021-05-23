@@ -148,8 +148,12 @@ namespace DnaVastgoed.Network {
         private string EncodeImage(string imageUrl) {
             using (WebClient webClient = new WebClient()) {
                 byte[] data = webClient.DownloadData(imageUrl);
+                string baseData = Convert.ToBase64String(data);
 
-                return Convert.ToBase64String(data);
+                Console.WriteLine("Loading image: " + imageUrl);
+                Console.WriteLine("Loading image data: " + baseData.Substring(0, 10));
+
+                return baseData;
             }
         }
 
