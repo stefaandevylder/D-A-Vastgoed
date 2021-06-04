@@ -87,6 +87,8 @@ namespace DnaVastgoed {
         /// us out and we can keep crawling the site?
         /// </summary>
         private async Task StartCrawler() {
+            Console.WriteLine("--------------------");
+
             var config = new CrawlConfiguration {
                 MaxPagesToCrawl = 1,
                 MinCrawlDelayPerDomainMilliSeconds = 10
