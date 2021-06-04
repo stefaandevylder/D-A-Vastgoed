@@ -75,9 +75,9 @@ namespace DnaVastgoed {
                 string link = item["link"].ToString().Replace(URL_REPLACE, URL_BASE);
 
                 _links.Add(link);
-
-                Console.WriteLine($"Link added: {link}");
             }
+
+            Console.WriteLine($"Links added: {_links.Count()}");
         }
 
         /// <summary>

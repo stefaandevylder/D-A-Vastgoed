@@ -137,6 +137,8 @@ namespace DnaVastgoed.Network {
                 pictures.Add(new Picture(i + 1, EncodeImage(imageUrl)));
             }
 
+            Console.WriteLine($"Pictures encoded: {pictures.Count()}");
+
             return pictures.ToArray();
         }
 
@@ -149,8 +151,6 @@ namespace DnaVastgoed.Network {
             using (WebClient webClient = new WebClient()) {
                 byte[] data = webClient.DownloadData(imageUrl);
                 string baseData = Convert.ToBase64String(data);
-
-                Console.WriteLine($"Loading image: {imageUrl} with data {baseData.Substring(0, 10)}");
 
                 return baseData;
             }
