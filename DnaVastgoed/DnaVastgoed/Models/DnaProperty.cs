@@ -149,6 +149,16 @@ namespace DnaVastgoed.Models {
         }
 
         /// <summary>
+        /// Returns a small string of the property.
+        /// </summary>
+        /// <returns>The property with only a few properties</returns>
+        public string ToSmallString() {
+            return $"Property {Name} with ID: {Id}" +
+                $"\nLoc: {Location}" +
+                $"\nAmount of images: {Images.Count()}";
+        }
+
+        /// <summary>
         /// Needed for console writing.
         /// </summary>
         /// <returns>The property with the right ID</returns>

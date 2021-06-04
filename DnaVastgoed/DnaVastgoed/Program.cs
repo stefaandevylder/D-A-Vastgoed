@@ -7,7 +7,6 @@ using DnaVastgoed.Network;
 using ImmoVlanAPI;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
-using RealoAPI;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -21,15 +20,13 @@ namespace DnaVastgoed {
 
         private readonly string URL_BASE = "http://104.248.85.244";
         private readonly string URL_REPLACE = "https://dnavastgoed.be";
-        private readonly bool STAGING = false;
 
         private ICollection<string> _links = new List<string>();
 
         private readonly PropertyRepository _repo;
         private readonly ImmoVlanClient _immovlanClient;
-        private readonly RealoClient _realoClient;
 
-        public Program() {
+        public Program(bool isStaging) {
             Configuration = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                 .AddUserSecrets<Program>()
@@ -40,8 +37,7 @@ namespace DnaVastgoed {
 
             _immovlanClient = new ImmoVlanClient(Configuration["ImmoVlan:BusinessEmail"],
                 Configuration["ImmoVlan:TechincalEmail"], int.Parse(Configuration["ImmoVlan:SoftwareId"]),
-                Configuration["ImmoVlan:ProCustomerId"], Configuration["ImmoVlan:SoftwarePassword"], STAGING);
-            _realoClient = new RealoClient(Configuration["Realo:PublicKey"], Configuration["Realo:PrivateKey"], STAGING);
+                Configuration["ImmoVlan:ProCustomerId"], Configuration["ImmoVlan:SoftwarePassword"], isStaging);
         }
 
         /// <summary>
@@ -102,7 +98,7 @@ namespace DnaVastgoed {
                 crawler = new PoliteWebCrawler(config);
                 crawler.PageCrawlCompleted += PageCrawlCompleted;
 
-                Console.WriteLine("Crawling link: " + link);
+                Console.WriteLine($"Crawling link: {link}");
 
                 await crawler.CrawlAsync(new Uri(link));
             }
@@ -121,7 +117,7 @@ namespace DnaVastgoed {
             DnaProperty property = new DnaProperty();
             property.ParseFromHTML(document, URL_REPLACE, URL_BASE);
 
-            Console.WriteLine("Found: " + property.ToString());
+            Console.WriteLine($"Found: {property.ToSmallString()}");
 
             AddOrUpdateProperty(property);
         }
@@ -191,9 +187,6 @@ namespace DnaVastgoed {
         private void PublishProperty(DnaProperty property) {
             var result = new ImmoVlanProperty(property).Publish(_immovlanClient);
             Console.WriteLine(result.Content);
-
-            // Realo is not active, it has not been paid for by this client.
-            // new RealoProperty(property).Publish(_realoClient, 1);
         }
 
         /// <summary>

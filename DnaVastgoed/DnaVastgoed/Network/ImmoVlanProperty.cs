@@ -86,7 +86,7 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>The decimal price form</returns>
         private decimal GetPrice() {
-            if (string.IsNullOrEmpty(_prop.Price)) return 0;
+            if (string.IsNullOrEmpty(_prop.Price) || !_prop.Price.Contains("€")) return 0;
 
             return decimal.Parse(_prop.Price.Replace("€", "").Replace(".", ""));
         }
@@ -119,8 +119,8 @@ namespace DnaVastgoed.Network {
         /// </summary>
         /// <returns>The energy score</returns>
         private int? GetEnergy() {
-            if (_prop.Energy == null || _prop.Energy == "")
-                return 0;
+            if (_prop.Energy == null || _prop.Energy == "") return 0;
+
             return int.Parse(_prop.Energy.Split(" ")[0]);
         }
 
@@ -150,8 +150,7 @@ namespace DnaVastgoed.Network {
                 byte[] data = webClient.DownloadData(imageUrl);
                 string baseData = Convert.ToBase64String(data);
 
-                Console.WriteLine("Loading image: " + imageUrl);
-                Console.WriteLine("Loading image data: " + baseData.Substring(0, 10));
+                Console.WriteLine($"Loading image: {imageUrl} with data {baseData.Substring(0, 10)}");
 
                 return baseData;
             }
