@@ -25,7 +25,7 @@ namespace DnaVastgoed.Network {
         public IRestResponse Publish(ImmoVlanClient client) {
             Property prop = new Property(_prop.Id, _prop.Id, GetCommercialStatus(),
                 new Classification(GetTransactionType(), GetPropertyType()),
-                new Location(new Address(GetLocation()[2], GetLocation()[0], GetLocation()[1], null, GetLocation()[3])) {
+                new Location(GetLocation()) {
                     IsAddressDisplayed = true
                 },
                 new Description(_prop.Description, _prop.Description),
@@ -64,21 +64,16 @@ namespace DnaVastgoed.Network {
         }
 
         /// <summary>
-        /// Get the location chopped up in a string.
-        /// 
-        /// 0: STREET
-        /// 1: NUMBER
-        /// 2: ZIP CODE
-        /// 3: CITY
+        /// Get the location already parsed in an adress.
         /// </summary>
-        /// <returns></returns>
-        private string[] GetLocation() {
+        /// <returns>The correct address object</returns>
+        private Address GetLocation() {
             string[] streetAndCity = _prop.Location.Split(", ");
 
             string[] streetAndNumber = streetAndCity[0].Split(" ");
             string[] zipAndCity = streetAndCity[1].Split(" ");
 
-            return new string[] { streetAndNumber[0], streetAndNumber[1], zipAndCity[0], zipAndCity[1] };
+            return new Address(zipAndCity[0], streetAndNumber[0], streetAndNumber[1], null, zipAndCity[1]);
         }
 
         /// <summary>

@@ -78,7 +78,7 @@ namespace DnaVastgoed {
                 _links.Add(link);
             }
 
-            Console.WriteLine($"Links added: {_links.Count()}");
+            Console.WriteLine($"Links cached: {_links.Count()}");
         }
 
         /// <summary>
